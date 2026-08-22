@@ -130,6 +130,15 @@ projesi değiştirilmemiştir.
 - Build öncesi doğrulama, yeni sesin mevcut ve geçerli bir mono `AudioClip`
   olduğunu kontrol eder.
 
+## 1.7.1 — Cetvel sesi taşma düzeltmesi
+
+- Önceki OGG'nin çözümleme sırasında `+2,5 dBTP` seviyesine çıkarak Android'de
+  distorsiyon oluşturma riski giderildi.
+- Ses yeniden sıkıştırılıp gerçek dosya üzerinde ölçüldü: yaklaşık `-18,7 LUFS`
+  bütünleşik ses yüksekliği ve `-0,8 dBTP` güvenli gerçek tepe seviyesi.
+- Kaynak telefon kaydına göre yaklaşık 15,5 LU daha yüksek olan sesin 500 birimlik
+  3B işitme menzili korunur.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -147,7 +156,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.7.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.7.1 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
