@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -16,6 +17,12 @@ public class CursedMobileInput : MonoBehaviour
 
     private Canvas canvas;
     private bool sceneWantsVisible;
+    private int lookFingerId = -1;
+    private Vector2 previousLookPosition;
+    private readonly List<RectTransform> lookBlockedRects = new List<RectTransform>();
+
+    private const float LookSensitivity = 0.12f;
+    private const float MaxLookPerFrame = 6.5f;
 
     public static bool IsActive
     {
@@ -74,6 +81,7 @@ public class CursedMobileInput : MonoBehaviour
     {
         if (instance == this)
         {
+            ResetLookTouch();
             instance = null;
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
@@ -90,6 +98,7 @@ public class CursedMobileInput : MonoBehaviour
         {
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
+            ResetLookTouch();
             for (int i = 0; i < actionStates.Length; i++) actionStates[i] = false;
         }
     }
@@ -97,15 +106,93 @@ public class CursedMobileInput : MonoBehaviour
     private void Update()
     {
         if (canvas == null) return;
-        // The Think Pad has its own touch buttons. Hiding the movement layer here
-        // prevents the right-side look zone from stealing math-keypad touches.
+        // The Think Pad has its own touch buttons. Hide gameplay controls and
+        // suspend raw camera-touch tracking while the math keypad is open.
         bool thinkPadIsOpen = FindObjectOfType<MathGameScript>() != null;
         canvas.enabled = sceneWantsVisible && !thinkPadIsOpen;
         if (thinkPadIsOpen)
         {
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
+            ResetLookTouch();
         }
+        else if (canvas.enabled && Time.timeScale > 0f)
+        {
+            UpdateRawTouchLook();
+        }
+        else
+        {
+            ResetLookTouch();
+        }
+    }
+
+    private void UpdateRawTouchLook()
+    {
+        bool trackedFingerFound = false;
+
+        // Unity's documented legacy mobile path: read every Android finger
+        // directly from Input.touchCount/Input.GetTouch in Update.
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            Touch touch = Input.GetTouch(i);
+
+            if (lookFingerId == -1 && touch.phase == TouchPhase.Began && IsLookTouchStart(touch.position))
+            {
+                lookFingerId = touch.fingerId;
+                previousLookPosition = touch.position;
+            }
+
+            if (touch.fingerId != lookFingerId) continue;
+            trackedFingerFound = true;
+
+            if (touch.phase == TouchPhase.Moved)
+            {
+                float screenDeltaX = touch.position.x - previousLookPosition.x;
+                previousLookPosition = touch.position;
+                float scaledDelta = screenDeltaX * LookSensitivity * (1920f / Mathf.Max(Screen.width, 1));
+                float limitedDelta = Mathf.Clamp(scaledDelta, -MaxLookPerFrame, MaxLookPerFrame);
+                lookDeltaX = Mathf.Clamp(lookDeltaX + limitedDelta, -18f, 18f);
+            }
+            else if (touch.phase == TouchPhase.Stationary)
+            {
+                previousLookPosition = touch.position;
+            }
+            else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+            {
+                ResetLookTouch();
+            }
+        }
+
+        if (lookFingerId != -1 && !trackedFingerFound)
+        {
+            ResetLookTouch();
+        }
+    }
+
+    private bool IsLookTouchStart(Vector2 screenPosition)
+    {
+        // Match the old right-side look zone while leaving the top inventory HUD free.
+        if (screenPosition.x < Screen.width * 0.42f || screenPosition.y > Screen.height * 0.80f)
+        {
+            return false;
+        }
+
+        // RUN/GRAB/USE/PAUSE remain normal UI touches and must never rotate the camera.
+        for (int i = 0; i < lookBlockedRects.Count; i++)
+        {
+            RectTransform blocked = lookBlockedRects[i];
+            if (blocked != null && RectTransformUtility.RectangleContainsScreenPoint(blocked, screenPosition, null))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void ResetLookTouch()
+    {
+        lookFingerId = -1;
+        previousLookPosition = Vector2.zero;
     }
 
     private void BuildUI()
@@ -125,13 +212,6 @@ public class CursedMobileInput : MonoBehaviour
         scaler.matchWidthOrHeight = 1f;
         gameObject.AddComponent<GraphicRaycaster>();
         sceneWantsVisible = true;
-
-        GameObject lookZone = MakePanel("Look Zone", transform, new Color(0f, 0f, 0f, 0.001f));
-        // Keep the top HUD free so all three inventory slots receive touches.
-        SetRect(lookZone.GetComponent<RectTransform>(), new Vector2(0.42f, 0f), new Vector2(1f, 0.80f), Vector2.zero, Vector2.zero);
-        CursedLookPad lookPad = lookZone.AddComponent<CursedLookPad>();
-        lookPad.sensitivity = 0.12f;
-        lookPad.maxDegreesPerEvent = 6.5f;
 
         GameObject joystickBase = MakePanel("Movement", transform, new Color(0.08f, 0f, 0f, 0.46f));
         RectTransform baseRect = joystickBase.GetComponent<RectTransform>();
@@ -155,7 +235,9 @@ public class CursedMobileInput : MonoBehaviour
     private void MakeActionButton(string label, InputAction action, Vector2 position, Vector2 anchor, Vector2 size, Color color)
     {
         GameObject buttonObject = MakePanel(label, transform, color);
-        SetRect(buttonObject.GetComponent<RectTransform>(), anchor, anchor, size, position);
+        RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
+        SetRect(buttonRect, anchor, anchor, size, position);
+        lookBlockedRects.Add(buttonRect);
         CursedHoldButton button = buttonObject.AddComponent<CursedHoldButton>();
         button.action = action;
 
@@ -211,44 +293,6 @@ public class CursedMobileInput : MonoBehaviour
             local = Vector2.ClampMagnitude(local, radius);
             moveVector = local / radius;
             if (knob != null) knob.anchoredPosition = local;
-        }
-    }
-
-    private class CursedLookPad : MonoBehaviour, IInitializePotentialDragHandler, IPointerDownHandler, IDragHandler, IPointerUpHandler
-    {
-        public float sensitivity;
-        public float maxDegreesPerEvent;
-        private int activePointerId = int.MinValue;
-        private Vector2 previousPointerPosition;
-
-        public void OnInitializePotentialDrag(PointerEventData eventData)
-        {
-            // Some Android devices otherwise wait for a large drag threshold and
-            // report a zero delta to the first drag event.
-            eventData.useDragThreshold = false;
-        }
-
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            if (activePointerId != int.MinValue) return;
-            activePointerId = eventData.pointerId;
-            previousPointerPosition = eventData.position;
-        }
-        public void OnDrag(PointerEventData eventData)
-        {
-            if (eventData.pointerId != activePointerId) return;
-            // PointerEventData.delta is unreliable on a number of Android WebView
-            // and native touch combinations, so calculate it from screen positions.
-            float screenDeltaX = eventData.position.x - previousPointerPosition.x;
-            previousPointerPosition = eventData.position;
-            float scaledDelta = screenDeltaX * sensitivity * (1920f / Mathf.Max(Screen.width, 1));
-            lookDeltaX = Mathf.Clamp(lookDeltaX + Mathf.Clamp(scaledDelta, -maxDegreesPerEvent, maxDegreesPerEvent), -18f, 18f);
-        }
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            if (eventData.pointerId != activePointerId) return;
-            activePointerId = int.MinValue;
-            previousPointerPosition = Vector2.zero;
         }
     }
 

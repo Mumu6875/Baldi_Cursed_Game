@@ -51,6 +51,15 @@ projesi değiştirilmemiştir.
 - Sürükleme eşiği kapatıldı; kamera küçük kaydırmalara hemen yanıt verir.
 - Dönüş hızı oynanabilir seviyeye yükseltilirken ani sıçrama sınırı korunur.
 
+## 1.4.2 — Ham Android Touch kamera girişi
+
+- Kamera, cihazdan olay alamayan UI/EventSystem sürükleme katmanından ayrıldı.
+- Sağ taraftaki kamera alanı doğrudan `Input.touchCount` ve `Input.GetTouch`
+  kullanarak Android parmak konumlarını her karede okur.
+- Oyuncu kamera kodunda dokunmadan üretilen fare ekseni kullanılmaz; çift giriş
+  engellenirken eski UI tıklama uyumluluğu korunur.
+- Eşya HUD'ı ile RUN/GRAB/USE/PAUSE alanları kamera dokunuşundan hariç tutuldu.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -68,7 +77,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.4.1 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.4.2 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
