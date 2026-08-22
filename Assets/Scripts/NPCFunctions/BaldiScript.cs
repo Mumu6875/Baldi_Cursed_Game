@@ -6,6 +6,24 @@ public class BaldiScript : MonoBehaviour
 	private void Start()
 	{
 		baldiAudio = GetComponent<AudioSource>(); //Get The Baldi Audio Source(Used mostly for the slap sound)
+		AudioClip replacementSlap = Resources.Load<AudioClip>("CursedMod/BaldiRulerLoud");
+		if (replacementSlap != null)
+		{
+			slap = replacementSlap;
+		}
+		else
+		{
+			Debug.LogError("Replacement Baldi ruler sound could not be loaded.");
+		}
+		if (baldiAudio != null)
+		{
+			// The supplied recording is peak-normalized in the imported asset.
+			// Extend its 3D reach so the ruler can be heard across long hallways.
+			baldiAudio.volume = 1f;
+			baldiAudio.spatialBlend = 1f;
+			baldiAudio.minDistance = Mathf.Max(baldiAudio.minDistance, 12f);
+			baldiAudio.maxDistance = Mathf.Max(baldiAudio.maxDistance, 500f);
+		}
 		agent = GetComponent<NavMeshAgent>(); //Get the Nav Mesh Agent
 		timeToMove = baseTime; //Sets timeToMove to baseTime
 		Wander(); //Start wandering

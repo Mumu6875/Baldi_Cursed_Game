@@ -118,6 +118,18 @@ projesi değiştirilmemiştir.
 - İmkânsız üçüncü soru ile Phase 1/Phase 2 yanlış cevap ve korku tetikleyicileri
   değiştirilmemiştir.
 
+## 1.7.0 — Yeni yüksek menzilli Baldi cetvel sesi
+
+- Özgün `BAL_Slap` klibi, verilen kayıt temel alınarak hazırlanan yeni mono OGG
+  sesle çalışma zamanında değiştirilir; tüm Baldi sahnelerinde aynı ses kullanılır.
+- Kayıttaki yaklaşık 0,85 saniyelik başlangıç sessizliği kaldırıldı; dinamik
+  sıkıştırma ve limiter ile ortalama seviye eski cetvel klibinden yaklaşık
+  1,2 dB daha yüksek hale getirildi.
+- Baldi ses kaynağının tam ses mesafesi en az 12 birime, azami işitme menzili
+  500 birime çıkarıldı ve ses tamamen 3B konumsal hale getirildi.
+- Build öncesi doğrulama, yeni sesin mevcut ve geçerli bir mono `AudioClip`
+  olduğunu kontrol eder.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -135,7 +147,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.6.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.7.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

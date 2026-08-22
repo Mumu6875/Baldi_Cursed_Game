@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.6.0";
+        PlayerSettings.bundleVersion = "1.7.0";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 13;
+        PlayerSettings.Android.bundleVersionCode = 14;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -84,6 +84,7 @@ public static class CursedAndroidSetup
 public sealed class CursedBuildValidation : IPreprocessBuildWithReport
 {
     private const string WarningAssetPath = "Assets/Resources/CursedMod/PiracyWarningPhase1.jpg";
+    private const string RulerAudioAssetPath = "Assets/Resources/CursedMod/BaldiRulerLoud.ogg";
     private static readonly string[] MobileButtonAssetPaths =
     {
         "Assets/Resources/CursedMod/MobileLookBackButton.png",
@@ -134,6 +135,18 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
             Debug.Log("Verified mobile button image: " + buttonPath + " (" + button.width + "x" + button.height + ")");
         }
         Debug.Log("Verified mobile Look Back and Run button images.");
+
+        if (!File.Exists(RulerAudioAssetPath))
+        {
+            throw new BuildFailedException("Required replacement Baldi ruler sound is missing: " + RulerAudioAssetPath);
+        }
+        AssetDatabase.ImportAsset(RulerAudioAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+        AudioClip rulerAudio = AssetDatabase.LoadAssetAtPath<AudioClip>(RulerAudioAssetPath);
+        if (rulerAudio == null || rulerAudio.length < 0.5f || rulerAudio.channels != 1)
+        {
+            throw new BuildFailedException("Replacement Baldi ruler sound could not be imported as a valid mono AudioClip: " + RulerAudioAssetPath);
+        }
+        Debug.Log("Verified replacement Baldi ruler sound: " + rulerAudio.length.ToString("F2") + " seconds, " + rulerAudio.frequency + " Hz.");
     }
 }
 #endif
