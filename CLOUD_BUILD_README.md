@@ -1,11 +1,11 @@
 # Baldi Cursed Classroom — Unity Build Automation adayı
 
 Bu klasör, özgün Unity 2018.3.9f1 mod projesinin **ayrı** bir Unity
-2019.4.40f1 bulut-derleme kopyasıdır. Özgün 2018.3 projesi değiştirilmemiştir.
+2019.4.41f1 bulut-derleme kopyasıdır. Özgün 2018.3 projesi değiştirilmemiştir.
 
 ## Unity Build Automation ayarları
 
-- Unity sürümü: `2019.4.40f1`
+- Unity sürümü: `2019.4.41f1` (CVE-2025-59489 düzeltmeli sürüm)
 - Platform: Android
 - Çıktı: APK (Google Play için AAB seçilebilir)
 - Minimum Android API: 23
@@ -24,11 +24,11 @@ Bu klasör, özgün Unity 2018.3.9f1 mod projesinin **ayrı** bir Unity
 
 ## Önemli dönüşüm notu
 
-Proje ilk kez Unity 2019.4.40f1 ile açıldığında Unity varlıkları ve proje
+Proje ilk kez Unity 2019.4.41f1 ile açıldığında Unity varlıkları ve proje
 ayarlarını 2018.3 biçiminden 2019.4 biçimine içe aktarır. Bu çalışma ortamında
 Unity Editor bulunmadığı için bu ilk içe aktarma yerelde çalıştırılamadı.
 Build Automation içe aktarma sırasında derleme hatası verirse projeyi bir kez
-Unity 2019.4.40f1 ile açın, Console'daki ilk hatayı düzeltin, kaydedin ve depoya
+Unity 2019.4.41f1 ile açın, Console'daki ilk hatayı düzeltin, kaydedin ve depoya
 yeniden gönderin.
 
 ## Lisans / dağıtım
