@@ -79,6 +79,18 @@ projesi değiştirilmemiştir.
 - Build doğrulayıcı dosyayı eşzamanlı yeniden içe aktarır ve hem fiziksel dosyayı
   hem de oluşan Unity `Texture2D` varlığını kontrol eder.
 
+## 1.5.0 — Mobil Run ve Look Back düğmeleri
+
+- Sağ taraftaki Run düğmesi, verilen koşan bacak görseliyle; yeni Look Back
+  düğmesi ise dikiz aynası görseliyle değiştirildi.
+- Android'de parmak düğme sınırından biraz taşınca Run durumunu erken bırakan
+  `PointerExit` davranışı kaldırıldı. Run artık parmak kaldırılana veya dokunuş
+  iptal edilene kadar basılı kalır.
+- Düğme olay bileşeni Unity'nin güvenilir biçimde oluşturabildiği üst seviye
+  bir `MonoBehaviour` haline getirildi; görseller build öncesinde doğrulanır.
+- Phase 2'de birinci defter sorularından biri yanlış cevaplandığında korku modu
+  hemen etkinleşir.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -96,7 +108,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.4.4 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.5.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

@@ -34,7 +34,11 @@ public static class CursedPhaseManager
 
     public static bool HandleFirstNotebookWrongAnswer()
     {
-        if (IsPhase2) return false;
+        if (IsPhase2)
+        {
+            CursedHorrorBootstrap.ActivateHorror();
+            return false;
+        }
         return ShowPiracyWarning();
     }
 

@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.4.4";
+        PlayerSettings.bundleVersion = "1.5.0";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 9;
+        PlayerSettings.Android.bundleVersionCode = 10;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -84,6 +84,11 @@ public static class CursedAndroidSetup
 public sealed class CursedBuildValidation : IPreprocessBuildWithReport
 {
     private const string WarningAssetPath = "Assets/Resources/CursedMod/PiracyWarningPhase1.jpg";
+    private static readonly string[] MobileButtonAssetPaths =
+    {
+        "Assets/Resources/CursedMod/MobileLookBackButton.png",
+        "Assets/Resources/CursedMod/MobileRunButton.png"
+    };
 
     public int callbackOrder { get { return -1000; } }
 
@@ -104,6 +109,21 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
             throw new BuildFailedException("Phase 1 warning image has an invalid resolution: " + warning.width + "x" + warning.height);
         }
         Debug.Log("Verified Phase 1 warning image: " + warning.width + "x" + warning.height);
+
+        foreach (string buttonPath in MobileButtonAssetPaths)
+        {
+            if (!File.Exists(buttonPath))
+            {
+                throw new BuildFailedException("Required mobile button image is missing: " + buttonPath);
+            }
+            AssetDatabase.ImportAsset(buttonPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+            Texture2D button = AssetDatabase.LoadAssetAtPath<Texture2D>(buttonPath);
+            if (button == null || button.width != 255 || button.height != 127)
+            {
+                throw new BuildFailedException("Mobile button image is invalid: " + buttonPath);
+            }
+        }
+        Debug.Log("Verified mobile Look Back and Run button images.");
     }
 }
 #endif

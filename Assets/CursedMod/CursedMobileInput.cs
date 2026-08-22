@@ -55,6 +55,19 @@ public class CursedMobileInput : MonoBehaviour
         return value;
     }
 
+    public static void SetTouchAction(InputAction action, bool pressed)
+    {
+        int index = (int)action;
+        if (index < 0 || index >= actionStates.Length) return;
+
+        actionStates[index] = pressed;
+        if (pressed && action == InputAction.PauseOrCancel)
+        {
+            // Keep a short unscaled pulse so InputManager cannot miss a quick tap.
+            pausePulseUntil = Time.unscaledTime + 0.14f;
+        }
+    }
+
     public static void EnsureForGameplayScene()
     {
         if (instance != null)
@@ -225,9 +238,10 @@ public class CursedMobileInput : MonoBehaviour
         knob.GetComponent<Image>().raycastTarget = false;
         joystick.knob = knobRect;
 
-        MakeActionButton("RUN", InputAction.Run, new Vector2(-150f, 185f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.48f, 0.02f, 0.02f, 0.86f));
-        MakeActionButton("GRAB", InputAction.Interact, new Vector2(-390f, 185f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
-        MakeActionButton("USE", InputAction.UseItem, new Vector2(-150f, 330f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
+        MakeTextureActionButton("LOOK BACK", "CursedMod/MobileLookBackButton", InputAction.LookBehind, new Vector2(-150f, 330f), new Vector2(0.88f, 0f));
+        MakeTextureActionButton("RUN", "CursedMod/MobileRunButton", InputAction.Run, new Vector2(-150f, 185f), new Vector2(0.88f, 0f));
+        MakeActionButton("GRAB", InputAction.Interact, new Vector2(-430f, 185f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
+        MakeActionButton("USE", InputAction.UseItem, new Vector2(-430f, 330f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
         // Top-center placement avoids covering the third inventory slot.
         MakeActionButton("II", InputAction.PauseOrCancel, new Vector2(0f, -68f), new Vector2(0.5f, 1f), new Vector2(104f, 88f), new Color(0.12f, 0f, 0f, 0.72f));
     }
@@ -238,7 +252,7 @@ public class CursedMobileInput : MonoBehaviour
         RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
         SetRect(buttonRect, anchor, anchor, size, position);
         lookBlockedRects.Add(buttonRect);
-        CursedHoldButton button = buttonObject.AddComponent<CursedHoldButton>();
+        CursedMobileHoldButton button = buttonObject.AddComponent<CursedMobileHoldButton>();
         button.action = action;
 
         GameObject textObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
@@ -253,6 +267,31 @@ public class CursedMobileInput : MonoBehaviour
         text.fontStyle = FontStyle.Bold;
         text.color = new Color(1f, 0.86f, 0.76f, 0.95f);
         text.raycastTarget = false;
+    }
+
+    private void MakeTextureActionButton(string fallbackLabel, string resourcePath, InputAction action, Vector2 position, Vector2 anchor)
+    {
+        Texture2D texture = Resources.Load<Texture2D>(resourcePath);
+        if (texture == null)
+        {
+            Debug.LogError("Mobile button texture could not be loaded: " + resourcePath);
+            MakeActionButton(fallbackLabel, action, position, anchor, new Vector2(255f, 127f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
+            return;
+        }
+
+        GameObject buttonObject = new GameObject(fallbackLabel, typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+        buttonObject.transform.SetParent(transform, false);
+        RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
+        SetRect(buttonRect, anchor, anchor, new Vector2(255f, 127f), position);
+        lookBlockedRects.Add(buttonRect);
+
+        RawImage image = buttonObject.GetComponent<RawImage>();
+        image.texture = texture;
+        image.color = Color.white;
+        image.raycastTarget = true;
+
+        CursedMobileHoldButton button = buttonObject.AddComponent<CursedMobileHoldButton>();
+        button.action = action;
     }
 
     private static GameObject MakePanel(string name, Transform parent, Color color)
@@ -296,25 +335,4 @@ public class CursedMobileInput : MonoBehaviour
         }
     }
 
-    private class CursedHoldButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
-    {
-        public InputAction action;
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            actionStates[(int)action] = true;
-            if (action == InputAction.PauseOrCancel)
-            {
-                // Keep a short unscaled pulse so InputManager cannot miss a quick tap.
-                pausePulseUntil = Time.unscaledTime + 0.14f;
-            }
-        }
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            actionStates[(int)action] = false;
-        }
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            actionStates[(int)action] = false;
-        }
-    }
 }
