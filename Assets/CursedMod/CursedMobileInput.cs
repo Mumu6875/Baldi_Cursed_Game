@@ -130,8 +130,8 @@ public class CursedMobileInput : MonoBehaviour
         // Keep the top HUD free so all three inventory slots receive touches.
         SetRect(lookZone.GetComponent<RectTransform>(), new Vector2(0.42f, 0f), new Vector2(1f, 0.80f), Vector2.zero, Vector2.zero);
         CursedLookPad lookPad = lookZone.AddComponent<CursedLookPad>();
-        lookPad.sensitivity = 0.085f;
-        lookPad.maxDegreesPerEvent = 5.5f;
+        lookPad.sensitivity = 0.12f;
+        lookPad.maxDegreesPerEvent = 6.5f;
 
         GameObject joystickBase = MakePanel("Movement", transform, new Color(0.08f, 0f, 0f, 0.46f));
         RectTransform baseRect = joystickBase.GetComponent<RectTransform>();
@@ -214,25 +214,41 @@ public class CursedMobileInput : MonoBehaviour
         }
     }
 
-    private class CursedLookPad : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+    private class CursedLookPad : MonoBehaviour, IInitializePotentialDragHandler, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         public float sensitivity;
         public float maxDegreesPerEvent;
         private int activePointerId = int.MinValue;
+        private Vector2 previousPointerPosition;
+
+        public void OnInitializePotentialDrag(PointerEventData eventData)
+        {
+            // Some Android devices otherwise wait for a large drag threshold and
+            // report a zero delta to the first drag event.
+            eventData.useDragThreshold = false;
+        }
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (activePointerId == int.MinValue) activePointerId = eventData.pointerId;
+            if (activePointerId != int.MinValue) return;
+            activePointerId = eventData.pointerId;
+            previousPointerPosition = eventData.position;
         }
         public void OnDrag(PointerEventData eventData)
         {
             if (eventData.pointerId != activePointerId) return;
-            float scaledDelta = eventData.delta.x * sensitivity * (1920f / Mathf.Max(Screen.width, 1));
-            lookDeltaX = Mathf.Clamp(lookDeltaX + Mathf.Clamp(scaledDelta, -maxDegreesPerEvent, maxDegreesPerEvent), -12f, 12f);
+            // PointerEventData.delta is unreliable on a number of Android WebView
+            // and native touch combinations, so calculate it from screen positions.
+            float screenDeltaX = eventData.position.x - previousPointerPosition.x;
+            previousPointerPosition = eventData.position;
+            float scaledDelta = screenDeltaX * sensitivity * (1920f / Mathf.Max(Screen.width, 1));
+            lookDeltaX = Mathf.Clamp(lookDeltaX + Mathf.Clamp(scaledDelta, -maxDegreesPerEvent, maxDegreesPerEvent), -18f, 18f);
         }
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (eventData.pointerId == activePointerId) activePointerId = int.MinValue;
+            if (eventData.pointerId != activePointerId) return;
+            activePointerId = int.MinValue;
+            previousPointerPosition = Vector2.zero;
         }
     }
 
