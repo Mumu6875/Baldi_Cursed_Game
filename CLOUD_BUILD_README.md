@@ -91,6 +91,15 @@ projesi değiştirilmemiştir.
 - Phase 2'de birinci defter sorularından biri yanlış cevaplandığında korku modu
   hemen etkinleşir.
 
+## 1.5.1 — Phase 2 müzik yavaşlatması
+
+- Phase 2 sırasında ana menünün `mus_Intro` parçası yarı hızda (`pitch 0.5`)
+  çalar; Baldi'nin ana menü konuşması normal hızda kalır.
+- Oyuna başlanınca çalan `schoolMusic` ve You Can Think Pad sırasında kullanılan
+  `learnMusic` yalnızca Phase 2'de yarı hızda çalar.
+- Müzik ayarı sahne yüklenir yüklenmez ve bir sonraki karede yeniden uygulanır;
+  geç oluşturulan ses nesnelerinde ayarın kaçırılması engellenir.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -108,7 +117,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.5.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.5.1 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

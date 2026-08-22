@@ -61,12 +61,16 @@ public class CursedHorrorBootstrap : MonoBehaviour
             horrorActive = false;
             RemoveDangerOverlay();
         }
+        ApplyPhase2MusicSpeed(scene);
         StartCoroutine(PatchSceneAfterActivation(scene));
     }
 
     private IEnumerator PatchSceneAfterActivation(Scene scene)
     {
         yield return null;
+
+        // Repeat after one frame as a safety net for objects instantiated by Start().
+        ApplyPhase2MusicSpeed(scene);
 
         bool gameplay = FindObjectOfType<PlayerScript>() != null || FindObjectOfType<PlayerMovement>() != null;
         if (gameplay)
@@ -89,6 +93,34 @@ public class CursedHorrorBootstrap : MonoBehaviour
         if (scene.name == "GameOver" && horrorActive)
         {
             InstallGameOverImage();
+        }
+    }
+
+    private static void ApplyPhase2MusicSpeed(Scene scene)
+    {
+        if (!CursedPhaseManager.IsPhase2) return;
+
+        if (scene.name == "MainMenu")
+        {
+            AudioSource[] menuSources = Resources.FindObjectsOfTypeAll<AudioSource>();
+            for (int i = 0; i < menuSources.Length; i++)
+            {
+                AudioSource source = menuSources[i];
+                if (!source.gameObject.scene.IsValid() || source.gameObject.scene != scene) continue;
+                if (source.clip != null && source.clip.name == "mus_Intro")
+                {
+                    source.pitch = 0.5f;
+                }
+            }
+        }
+
+        GameControllerScript controller = FindObjectOfType<GameControllerScript>();
+        if (controller != null)
+        {
+            // schoolMusic is heard when gameplay begins; learnMusic is the
+            // You Can Think Pad background track.
+            if (controller.schoolMusic != null) controller.schoolMusic.pitch = 0.5f;
+            if (controller.learnMusic != null) controller.learnMusic.pitch = 0.5f;
         }
     }
 
