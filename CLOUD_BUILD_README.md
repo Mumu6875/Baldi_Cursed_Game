@@ -33,6 +33,15 @@ ve sahne yeniden serileştirme işlemi yerelde çalıştırılamadı. Build Auto
 ilk içe aktarmada bir C# veya varlık dönüşüm hatası verirse gerçek logdaki ilk
 hata düzeltilip yeni bir geçiş turu yapılmalıdır.
 
+## Unity 6.3 bulut düzeltmeleri
+
+- Eski ve kullanılmayan TMP örnek script derleme hataları kaldırıldı.
+- TMP ayar kaynağı `assetVersion: 2` olarak işaretlendi; batch mode sırasında
+  grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
+- Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
+  kaynakları kaldırıldı.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.2.0 olarak sabitlendi.
+
 ## Lisans / dağıtım
 
 Temel topluluk projesinin koşulları gereği yalnızca ticari olmayan kullanım
