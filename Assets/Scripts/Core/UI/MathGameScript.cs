@@ -251,11 +251,11 @@ public class MathGameScript : MonoBehaviour
     }
     public void CheckAnswer()
     {
-        // The second notebook's final submitted answer begins the horror phase.
-        // This also covers the intentionally impossible third question.
+        // Phase 1 shows the fake piracy warning and exits. On the next launch,
+        // Phase 2 uses the same answer submission to begin the horror phase.
         if (problem == 3 && gc.notebooks == 2)
         {
-            CursedHorrorBootstrap.ActivateHorror();
+            if (CursedPhaseManager.HandleSecondNotebookFinalAnswer()) return;
         }
         if (playerAnswer.text == "31718")
         {

@@ -35,6 +35,15 @@ projesi değiştirilmemiştir.
 - Korku ve Room 99 aydınlatması, oynanabilirliği korumak için önceki sürümden
   daha aydınlık ayarlandı.
 
+## 1.4.0 — Phase 1 / Phase 2
+
+- İlk kurulum Phase 1 olarak başlar. İkinci defterin üçüncü cevabı gönderilince
+  tam ekran sahte korsan-sürüm uyarısı gösterilir.
+- Uyarıya dokunulduğunda Phase 2 kalıcı olarak kaydedilir ve Android uygulaması
+  kapanır.
+- Oyun yeniden açıldığında Phase 2 etkindir. Bu kez ikinci defterin üçüncü
+  cevabı gönderildiğinde uyarı yerine lanetli korku aşaması başlar.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -52,7 +61,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.3.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.4.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
