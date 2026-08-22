@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.5.1";
+        PlayerSettings.bundleVersion = "1.5.2";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 11;
+        PlayerSettings.Android.bundleVersionCode = 12;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -118,10 +118,20 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
             }
             AssetDatabase.ImportAsset(buttonPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
             Texture2D button = AssetDatabase.LoadAssetAtPath<Texture2D>(buttonPath);
-            if (button == null || button.width != 255 || button.height != 127)
+            if (button == null)
             {
-                throw new BuildFailedException("Mobile button image is invalid: " + buttonPath);
+                throw new BuildFailedException("Mobile button image could not be imported: " + buttonPath);
             }
+
+            // Unity's default NPOT import setting may convert the 255x127 source
+            // image to 256x128. Validate useful imported dimensions and aspect
+            // ratio instead of rejecting Unity's expected conversion.
+            float aspect = (float)button.width / Mathf.Max(button.height, 1);
+            if (button.width < 240 || button.height < 120 || aspect < 1.9f || aspect > 2.1f)
+            {
+                throw new BuildFailedException("Mobile button image has invalid imported dimensions: " + buttonPath + " (" + button.width + "x" + button.height + ")");
+            }
+            Debug.Log("Verified mobile button image: " + buttonPath + " (" + button.width + "x" + button.height + ")");
         }
         Debug.Log("Verified mobile Look Back and Run button images.");
     }

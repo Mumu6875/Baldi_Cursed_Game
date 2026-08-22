@@ -100,6 +100,15 @@ projesi değiştirilmemiştir.
 - Müzik ayarı sahne yüklenir yüklenmez ve bir sonraki karede yeniden uygulanır;
   geç oluşturulan ses nesnelerinde ayarın kaçırılması engellenir.
 
+## 1.5.2 — Unity NPOT düğme içe aktarma düzeltmesi
+
+- Unity'nin 255x127 kaynak düğmeleri varsayılan NPOT ayarıyla 256x128 olarak
+  içe aktarması artık geçerli kabul edilir.
+- Build doğrulaması dosyanın varlığını, başarıyla `Texture2D` oluşmasını,
+  oynanabilir minimum ölçüyü ve yaklaşık 2:1 en-boy oranını kontrol eder.
+- Başarısız build günlüğündeki tek durdurucu hata olan gereksiz tam piksel
+  eşitliği kaldırıldı; doğrulanan gerçek içe aktarma ölçüsü loga yazdırılır.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -117,7 +126,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.5.1 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.5.2 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
