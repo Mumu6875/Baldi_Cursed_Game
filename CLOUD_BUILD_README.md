@@ -109,6 +109,15 @@ projesi değiştirilmemiştir.
 - Başarısız build günlüğündeki tek durdurucu hata olan gereksiz tam piksel
   eşitliği kaldırıldı; doğrulanan gerçek içe aktarma ölçüsü loga yazdırılır.
 
+## 1.6.0 — Think Pad çarpma soruları
+
+- Çözülebilir You Can Think Pad soruları artık toplama ve çıkarmaya ek olarak
+  `0–9` aralığında çarpma işlemleri de üretir.
+- Üç işlem eşit olasılıkla seçilir ve çarpma soruları mevcut `BAL_Math_Times`
+  sesini kullanarak Baldi tarafından doğru sırada okunur.
+- İmkânsız üçüncü soru ile Phase 1/Phase 2 yanlış cevap ve korku tetikleyicileri
+  değiştirilmemiştir.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -126,7 +135,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.5.2 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.6.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

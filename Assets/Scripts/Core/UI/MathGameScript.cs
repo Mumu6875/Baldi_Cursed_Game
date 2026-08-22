@@ -64,7 +64,9 @@ public class MathGameScript : MonoBehaviour
             {
                 num1 = (float)Mathf.RoundToInt(UnityEngine.Random.Range(0f, 9f));
                 num2 = (float)Mathf.RoundToInt(UnityEngine.Random.Range(0f, 9f));
-                sign = Mathf.RoundToInt(UnityEngine.Random.Range(0f, 1f));
+                // 0 = addition, 1 = subtraction, 2 = multiplication.
+                // The integer overload keeps all three operations equally likely.
+                sign = UnityEngine.Random.Range(0, 3);
                 QueueAudio(bal_numbers[Mathf.RoundToInt(num1)]);
                 if (sign == 0)
                 {
@@ -95,6 +97,21 @@ public class MathGameScript : MonoBehaviour
                         "="
                     });
                     QueueAudio(bal_minus);
+                }
+                else
+                {
+                    solution = num1 * num2;
+                    questionText.text = string.Concat(new object[]
+                    {
+                        "SOLVE MATH Q",
+                        problem,
+                        ": \n \n",
+                        num1,
+                        "X",
+                        num2,
+                        "="
+                    });
+                    QueueAudio(bal_times);
                 }
                 QueueAudio(bal_numbers[Mathf.RoundToInt(num2)]);
                 QueueAudio(bal_equals);
