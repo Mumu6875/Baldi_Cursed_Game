@@ -46,8 +46,11 @@ public class PlayerScript : MonoBehaviour
 	private void MouseMove()
 	{
 		playerRotation.eulerAngles = new Vector3(playerRotation.eulerAngles.x, playerRotation.eulerAngles.y, fliparoo);
-		float horizontalLook = Input.GetAxis("Mouse X") * mouseSensitivity * Time.timeScale;
-		horizontalLook += CursedMobileInput.ConsumeLookDeltaX();
+		// Android can emulate Mouse X from the same finger that drives the custom
+		// look pad. Never add both sources or a single swipe is applied twice.
+		float horizontalLook = CursedMobileInput.IsActive
+			? CursedMobileInput.ConsumeLookDeltaX()
+			: Input.GetAxis("Mouse X") * mouseSensitivity * Time.timeScale;
 		playerRotation.eulerAngles = playerRotation.eulerAngles + Vector3.up * horizontalLook * flipaturn;
 		transform.rotation = playerRotation;
 	}

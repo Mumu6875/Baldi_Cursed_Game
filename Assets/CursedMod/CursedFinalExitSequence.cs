@@ -107,14 +107,14 @@ public class CursedFinalExitSequence : MonoBehaviour
     private void ApplyRoom99Lighting()
     {
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-        RenderSettings.ambientLight = new Color(0.007f, 0.007f, 0.009f, 1f);
+        RenderSettings.ambientLight = new Color(0.028f, 0.028f, 0.035f, 1f);
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.ExponentialSquared;
         RenderSettings.fogColor = new Color(0.88f, 0.9f, 0.92f, 1f);
-        RenderSettings.fogDensity = 0.075f;
+        RenderSettings.fogDensity = 0.048f;
 
         Light[] lights = FindObjectsOfType<Light>();
-        for (int i = 0; i < lights.Length; i++) lights[i].intensity *= 0.08f;
+        for (int i = 0; i < lights.Length; i++) lights[i].intensity *= 0.18f;
 
         CursedFlickerLight flicker = Camera.main != null ? Camera.main.GetComponent<CursedFlickerLight>() : null;
         if (flicker != null) flicker.enabled = false;
@@ -126,8 +126,8 @@ public class CursedFinalExitSequence : MonoBehaviour
             Light dimLight = Camera.main.GetComponent<Light>();
             if (dimLight == null) dimLight = Camera.main.gameObject.AddComponent<Light>();
             dimLight.type = LightType.Point;
-            dimLight.range = 7.5f;
-            dimLight.intensity = 0.13f;
+            dimLight.range = 10f;
+            dimLight.intensity = 0.30f;
             dimLight.color = new Color(0.72f, 0.77f, 0.82f, 1f);
         }
     }

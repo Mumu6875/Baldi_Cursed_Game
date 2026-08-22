@@ -21,8 +21,11 @@ public class PlayerMovement : MonoBehaviour
 	private void MouseMove()
 	{
 		Quaternion rotation = transform.rotation;
-		float horizontalLook = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime * Time.timeScale;
-		horizontalLook += CursedMobileInput.ConsumeLookDeltaX();
+		// Android can emulate Mouse X from the same finger that drives the custom
+		// look pad. Never add both sources or a single swipe is applied twice.
+		float horizontalLook = CursedMobileInput.IsActive
+			? CursedMobileInput.ConsumeLookDeltaX()
+			: Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime * Time.timeScale;
 		rotation.eulerAngles += new Vector3(0f, horizontalLook, 0f);
 		transform.rotation = rotation;
 	}

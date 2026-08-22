@@ -12,6 +12,7 @@ public class CursedMobileInput : MonoBehaviour
     private static readonly bool[] actionStates = new bool[(int)InputAction.Count];
     private static Vector2 moveVector;
     private static float lookDeltaX;
+    private static float pausePulseUntil;
 
     private Canvas canvas;
     private bool sceneWantsVisible;
@@ -34,6 +35,8 @@ public class CursedMobileInput : MonoBehaviour
             case InputAction.MoveBackward: return moveVector.y < -0.22f;
             case InputAction.MoveLeft: return moveVector.x < -0.22f;
             case InputAction.MoveRight: return moveVector.x > 0.22f;
+            case InputAction.PauseOrCancel:
+                return actionStates[(int)action] || Time.unscaledTime < pausePulseUntil;
             default: return actionStates[(int)action];
         }
     }
@@ -74,6 +77,7 @@ public class CursedMobileInput : MonoBehaviour
             instance = null;
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
+            pausePulseUntil = 0f;
             for (int i = 0; i < actionStates.Length; i++) actionStates[i] = false;
         }
     }
@@ -123,9 +127,11 @@ public class CursedMobileInput : MonoBehaviour
         sceneWantsVisible = true;
 
         GameObject lookZone = MakePanel("Look Zone", transform, new Color(0f, 0f, 0f, 0.001f));
-        SetRect(lookZone.GetComponent<RectTransform>(), new Vector2(0.42f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
+        // Keep the top HUD free so all three inventory slots receive touches.
+        SetRect(lookZone.GetComponent<RectTransform>(), new Vector2(0.42f, 0f), new Vector2(1f, 0.80f), Vector2.zero, Vector2.zero);
         CursedLookPad lookPad = lookZone.AddComponent<CursedLookPad>();
-        lookPad.sensitivity = 0.23f;
+        lookPad.sensitivity = 0.085f;
+        lookPad.maxDegreesPerEvent = 5.5f;
 
         GameObject joystickBase = MakePanel("Movement", transform, new Color(0.08f, 0f, 0f, 0.46f));
         RectTransform baseRect = joystickBase.GetComponent<RectTransform>();
@@ -142,7 +148,8 @@ public class CursedMobileInput : MonoBehaviour
         MakeActionButton("RUN", InputAction.Run, new Vector2(-150f, 185f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.48f, 0.02f, 0.02f, 0.86f));
         MakeActionButton("GRAB", InputAction.Interact, new Vector2(-390f, 185f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
         MakeActionButton("USE", InputAction.UseItem, new Vector2(-150f, 330f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
-        MakeActionButton("II", InputAction.PauseOrCancel, new Vector2(-82f, -74f), new Vector2(1f, 1f), new Vector2(92f, 92f), new Color(0.12f, 0f, 0f, 0.72f));
+        // Top-center placement avoids covering the third inventory slot.
+        MakeActionButton("II", InputAction.PauseOrCancel, new Vector2(0f, -68f), new Vector2(0.5f, 1f), new Vector2(104f, 88f), new Color(0.12f, 0f, 0f, 0.72f));
     }
 
     private void MakeActionButton(string label, InputAction action, Vector2 position, Vector2 anchor, Vector2 size, Color color)
@@ -210,23 +217,44 @@ public class CursedMobileInput : MonoBehaviour
     private class CursedLookPad : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         public float sensitivity;
-        private Vector2 previous;
+        public float maxDegreesPerEvent;
+        private int activePointerId = int.MinValue;
 
-        public void OnPointerDown(PointerEventData eventData) { previous = eventData.position; }
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (activePointerId == int.MinValue) activePointerId = eventData.pointerId;
+        }
         public void OnDrag(PointerEventData eventData)
         {
-            Vector2 delta = eventData.position - previous;
-            previous = eventData.position;
-            lookDeltaX += delta.x * sensitivity;
+            if (eventData.pointerId != activePointerId) return;
+            float scaledDelta = eventData.delta.x * sensitivity * (1920f / Mathf.Max(Screen.width, 1));
+            lookDeltaX = Mathf.Clamp(lookDeltaX + Mathf.Clamp(scaledDelta, -maxDegreesPerEvent, maxDegreesPerEvent), -12f, 12f);
         }
-        public void OnPointerUp(PointerEventData eventData) { }
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            if (eventData.pointerId == activePointerId) activePointerId = int.MinValue;
+        }
     }
 
     private class CursedHoldButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
     {
         public InputAction action;
-        public void OnPointerDown(PointerEventData eventData) { actionStates[(int)action] = true; }
-        public void OnPointerUp(PointerEventData eventData) { actionStates[(int)action] = false; }
-        public void OnPointerExit(PointerEventData eventData) { actionStates[(int)action] = false; }
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            actionStates[(int)action] = true;
+            if (action == InputAction.PauseOrCancel)
+            {
+                // Keep a short unscaled pulse so InputManager cannot miss a quick tap.
+                pausePulseUntil = Time.unscaledTime + 0.14f;
+            }
+        }
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            actionStates[(int)action] = false;
+        }
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            actionStates[(int)action] = false;
+        }
     }
 }

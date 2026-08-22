@@ -15,6 +15,17 @@ public class CursedHorrorBootstrap : MonoBehaviour
     private Sprite cursedBaldiSprite;
     private Image dangerFlash;
     private float pulse;
+    private bool horrorActive;
+
+    public static bool HorrorActive
+    {
+        get { return instance != null && instance.horrorActive; }
+    }
+
+    public static void ActivateHorror()
+    {
+        if (instance != null) instance.ActivateHorrorInternal();
+    }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Install()
@@ -45,32 +56,50 @@ public class CursedHorrorBootstrap : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if (scene.name == "MainMenu" || scene.name == "Warning")
+        {
+            horrorActive = false;
+            RemoveDangerOverlay();
+        }
         StartCoroutine(PatchSceneAfterActivation(scene));
     }
 
     private IEnumerator PatchSceneAfterActivation(Scene scene)
     {
         yield return null;
-        PatchBaldiVisuals();
-        PatchThinkPad();
 
         bool gameplay = FindObjectOfType<PlayerScript>() != null || FindObjectOfType<PlayerMovement>() != null;
         if (gameplay)
         {
             CursedMobileInput.EnsureForGameplayScene();
             CursedFinalExitSequence.EnsureInstalled();
-            InstallAtmosphere();
-            InstallDangerOverlay();
+            if (horrorActive)
+            {
+                PatchBaldiVisuals();
+                PatchThinkPad();
+                InstallAtmosphere();
+                InstallDangerOverlay();
+            }
         }
         else
         {
             CursedMobileInput.Hide();
         }
 
-        if (scene.name == "GameOver")
+        if (scene.name == "GameOver" && horrorActive)
         {
             InstallGameOverImage();
         }
+    }
+
+    private void ActivateHorrorInternal()
+    {
+        if (horrorActive) return;
+        horrorActive = true;
+        PatchBaldiVisuals();
+        PatchThinkPad();
+        InstallAtmosphere();
+        InstallDangerOverlay();
     }
 
     private void PatchBaldiVisuals()
@@ -124,18 +153,18 @@ public class CursedHorrorBootstrap : MonoBehaviour
     {
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.ExponentialSquared;
-        RenderSettings.fogDensity = 0.018f;
-        RenderSettings.fogColor = new Color(0.035f, 0.002f, 0.002f, 1f);
+        RenderSettings.fogDensity = 0.010f;
+        RenderSettings.fogColor = new Color(0.075f, 0.018f, 0.018f, 1f);
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-        RenderSettings.ambientLight = new Color(0.12f, 0.055f, 0.055f, 1f);
+        RenderSettings.ambientLight = new Color(0.30f, 0.17f, 0.16f, 1f);
 
         Camera camera = Camera.main;
         if (camera != null && camera.GetComponent<CursedFlickerLight>() == null)
         {
             Light light = camera.gameObject.AddComponent<Light>();
             light.type = LightType.Point;
-            light.range = 13f;
-            light.intensity = 0.72f;
+            light.range = 18f;
+            light.intensity = 1.05f;
             light.color = new Color(1f, 0.62f, 0.52f);
             camera.gameObject.AddComponent<CursedFlickerLight>().lightSource = light;
         }
@@ -160,6 +189,14 @@ public class CursedHorrorBootstrap : MonoBehaviour
         dangerFlash = flashObject.GetComponent<Image>();
         dangerFlash.color = new Color(0.35f, 0f, 0f, 0f);
         dangerFlash.raycastTarget = false;
+    }
+
+    private void RemoveDangerOverlay()
+    {
+        if (dangerFlash == null) return;
+        GameObject root = dangerFlash.transform.root.gameObject;
+        dangerFlash = null;
+        Destroy(root);
     }
 
     private void Update()
@@ -220,6 +257,7 @@ public static class CursedThinkPadInstaller
     public static void ApplyTo(MathGameScript math)
     {
         if (math == null) return;
+        if (!CursedHorrorBootstrap.HorrorActive) return;
         Texture2D texture = Resources.Load<Texture2D>("CursedMod/CursedThinkPad");
         if (texture == null) return;
         GameObject root = math.mathGame != null ? math.mathGame : math.gameObject;

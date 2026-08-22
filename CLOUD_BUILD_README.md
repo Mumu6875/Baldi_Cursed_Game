@@ -23,6 +23,18 @@ projesi değiştirilmemiştir.
 - Room 99 kapısından geçmek, çalışma anında oluşturulan 11x11 karanlık labirente götürür.
 - Labirentin en derinindeki beyaz sis çekirdeğine girildiğinde oyun kapanır.
 
+## 1.3.0 — Mobil kontrol ve korku geçişi
+
+- Android kamera kaydırması tek dokunuş kaynağına sabitlendi; çift/ani dönüşler
+  engellendi ve hassasiyet azaltıldı.
+- Duraklatma dokunuşu kısa bir giriş darbesiyle güvenilir hale getirildi; buton
+  üçüncü eşya yuvasından ekranın üst ortasına taşındı.
+- Oyun normal ışıkla, normal Baldi ve normal Think Pad görünümüyle başlar.
+- İkinci defterin son sorusu gönderildiğinde korku aşaması etkinleşir: ortam
+  kararır ve Baldi ile Think Pad lanetli görünüme geçer.
+- Korku ve Room 99 aydınlatması, oynanabilirliği korumak için önceki sürümden
+  daha aydınlık ayarlandı.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -40,7 +52,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.2.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.3.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

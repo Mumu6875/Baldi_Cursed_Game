@@ -251,6 +251,12 @@ public class MathGameScript : MonoBehaviour
     }
     public void CheckAnswer()
     {
+        // The second notebook's final submitted answer begins the horror phase.
+        // This also covers the intentionally impossible third question.
+        if (problem == 3 && gc.notebooks == 2)
+        {
+            CursedHorrorBootstrap.ActivateHorror();
+        }
         if (playerAnswer.text == "31718")
         {
             StartCoroutine(CheatText("THIS IS WHERE IT ALL BEGAN"));
