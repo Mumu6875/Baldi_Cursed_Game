@@ -19,12 +19,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.1.0";
+        PlayerSettings.bundleVersion = "1.2.0";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
-        PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel23;
+        PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 2;
+        PlayerSettings.Android.bundleVersionCode = 3;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
