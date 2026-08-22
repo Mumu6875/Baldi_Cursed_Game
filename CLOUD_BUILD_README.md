@@ -68,8 +68,16 @@ projesi değiştirilmemiştir.
   hemen gösterir. İkinci defterin son cevabı alternatif tetikleyici olarak kalır.
 - Önceki test kurulumlarındaki Phase 2 kaydından bağımsız yeni bir durum anahtarı
   kullanılır; bu sürüm ilk açılışta yenilenmiş Phase 1'i bir kez gösterir.
-- Build öncesi doğrulama, 1672x941 uyarı PNG'sinin Resources içinde gerçekten
+- Build öncesi doğrulama, 1672x941 uyarı görselinin Resources içinde gerçekten
   bulunmasını zorunlu kılar; eksik görselle APK üretilemez.
+
+## 1.4.4 — Bulut görsel içe aktarma düzeltmesi
+
+- GitHub aktarımında kesilerek bozulmuş büyük PNG kaldırıldı.
+- Aynı 1672x941 uyarı görseli, tamlığı doğrulanmış 325 KB yüksek kaliteli JPEG
+  olarak eklendi; metin ve görünüm korunur.
+- Build doğrulayıcı dosyayı eşzamanlı yeniden içe aktarır ve hem fiziksel dosyayı
+  hem de oluşan Unity `Texture2D` varlığını kontrol eder.
 
 ## Önemli dönüşüm notu
 
@@ -88,7 +96,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.4.3 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.4.4 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

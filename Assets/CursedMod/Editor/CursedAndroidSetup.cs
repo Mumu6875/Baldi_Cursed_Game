@@ -4,6 +4,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 
 [InitializeOnLoad]
 public static class CursedAndroidSetup
@@ -20,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.4.3";
+        PlayerSettings.bundleVersion = "1.4.4";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 8;
+        PlayerSettings.Android.bundleVersionCode = 9;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -82,12 +83,17 @@ public static class CursedAndroidSetup
 
 public sealed class CursedBuildValidation : IPreprocessBuildWithReport
 {
-    private const string WarningAssetPath = "Assets/Resources/CursedMod/PiracyWarningPhase1.png";
+    private const string WarningAssetPath = "Assets/Resources/CursedMod/PiracyWarningPhase1.jpg";
 
     public int callbackOrder { get { return -1000; } }
 
     public void OnPreprocessBuild(BuildReport report)
     {
+        if (!File.Exists(WarningAssetPath))
+        {
+            throw new BuildFailedException("Required Phase 1 warning image file is missing: " + WarningAssetPath);
+        }
+        AssetDatabase.ImportAsset(WarningAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
         Texture2D warning = AssetDatabase.LoadAssetAtPath<Texture2D>(WarningAssetPath);
         if (warning == null)
         {
