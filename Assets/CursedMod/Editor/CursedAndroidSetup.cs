@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.7.1";
+        PlayerSettings.bundleVersion = "1.7.2";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 15;
+        PlayerSettings.Android.bundleVersionCode = 16;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -142,9 +142,9 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
         }
         AssetDatabase.ImportAsset(RulerAudioAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
         AudioClip rulerAudio = AssetDatabase.LoadAssetAtPath<AudioClip>(RulerAudioAssetPath);
-        if (rulerAudio == null || rulerAudio.length < 0.5f || rulerAudio.channels != 1)
+        if (rulerAudio == null || rulerAudio.length < 0.5f || rulerAudio.length > 1.0f || rulerAudio.channels != 1)
         {
-            throw new BuildFailedException("Replacement Baldi ruler sound could not be imported as a valid mono AudioClip: " + RulerAudioAssetPath);
+            throw new BuildFailedException("Replacement Baldi ruler sound must be a 0.5-1.0 second mono AudioClip: " + RulerAudioAssetPath);
         }
         Debug.Log("Verified replacement Baldi ruler sound: " + rulerAudio.length.ToString("F2") + " seconds, " + rulerAudio.frequency + " Hz.");
     }

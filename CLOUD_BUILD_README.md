@@ -139,6 +139,17 @@ projesi değiştirilmemiştir.
 - Kaynak telefon kaydına göre yaklaşık 15,5 LU daha yüksek olan sesin 500 birimlik
   3B işitme menzili korunur.
 
+## 1.7.2 — Tek vuruş ses iyileştirmesi
+
+- Uzun ve birden fazla adım içeren kayıt, Baldi hızlandığında seslerin üst üste
+  binmemesi için en temiz tek vuruşa indirildi (`0,57 sn`, mono, `48 kHz`).
+- Telefon kaydına hafif gürültü temizleme, dip gürültüsü filtresi, gövde/atak EQ'su,
+  yumuşak kompresyon ve giriş/çıkış geçişleri uygulandı.
+- Son OGG dosyası çözülmüş haliyle yaklaşık `-16,0 LUFS` ve `-2,1 dBTP` ölçülür;
+  bu değer güçlü duyulurken dijital taşma payı bırakır.
+- Build doğrulaması sesin mono ve `0,5–1,0 sn` arasında olduğunu kontrol eder.
+  Baldi'nin mevcut 12/500 birimlik 3B ses mesafeleri değiştirilmemiştir.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -156,7 +167,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.7.1 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.7.2 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
