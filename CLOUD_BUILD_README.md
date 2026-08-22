@@ -1,12 +1,12 @@
 # Baldi Cursed Classroom — Unity Build Automation adayı
 
 Bu klasör, özgün Unity 2018.3.9f1 mod projesinin **ayrı** bir
-Unity 6000.5.9f1 (Unity 6.5) büyük-sürüm geçiş adayıdır. Özgün 2018.3
+Unity 6000.3.22f1 (Unity 6.3 LTS) büyük-sürüm geçiş adayıdır. Özgün 2018.3
 projesi değiştirilmemiştir.
 
 ## Unity Build Automation ayarları
 
-- Unity sürümü: `6000.5.9f1`
+- Unity sürümü: `6000.3.22f1` (Unity Build Automation destekli LTS)
 - Platform: Android
 - Çıktı: APK (Google Play için AAB seçilebilir)
 - Minimum Android API: 26
@@ -25,9 +25,9 @@ projesi değiştirilmemiştir.
 
 ## Önemli dönüşüm notu
 
-Bu paket Unity 6.5 geçiş adayıdır. Eski Analytics, Package Manager UI,
+Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
 TextMesh Pro 1.3 ve kaldırılmış yerleşik modül bağımlılıkları temizlenmiş;
-Unity 6.5 ile gelen uGUI 2.6.0/TMP birleşimine geçirilmiştir. Bu çalışma
+Unity 6 ile gelen uGUI 2.0.0/TMP birleşimine geçirilmiştir. Bu çalışma
 ortamında Unity Editor bulunmadığı için ilk Asset Database yeniden içe aktarma
 ve sahne yeniden serileştirme işlemi yerelde çalıştırılamadı. Build Automation
 ilk içe aktarmada bir C# veya varlık dönüşüm hatası verirse gerçek logdaki ilk
