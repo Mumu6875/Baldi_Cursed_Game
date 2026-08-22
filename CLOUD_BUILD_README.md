@@ -60,6 +60,17 @@ projesi değiştirilmemiştir.
   engellenirken eski UI tıklama uyumluluğu korunur.
 - Eşya HUD'ı ile RUN/GRAB/USE/PAUSE alanları kamera dokunuşundan hariç tutuldu.
 
+## 1.4.3 — Notebook klavyesi ve erken Phase 1 uyarısı
+
+- Notebook cevap alanı prefab ve çalışma zamanı seviyesinde etkileşimsiz/salt
+  okunur yapıldı; Android yazılım klavyesi artık çağrılmaz.
+- Phase 1 sırasında birinci defterde yanlış cevap verilmesi korsan uyarısını
+  hemen gösterir. İkinci defterin son cevabı alternatif tetikleyici olarak kalır.
+- Önceki test kurulumlarındaki Phase 2 kaydından bağımsız yeni bir durum anahtarı
+  kullanılır; bu sürüm ilk açılışta yenilenmiş Phase 1'i bir kez gösterir.
+- Build öncesi doğrulama, 1672x941 uyarı PNG'sinin Resources içinde gerçekten
+  bulunmasını zorunlu kılar; eksik görselle APK üretilemez.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -77,7 +88,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.4.2 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.4.3 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

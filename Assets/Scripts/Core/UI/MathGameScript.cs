@@ -11,6 +11,7 @@ public class MathGameScript : MonoBehaviour
     {
         gc.ActivateLearningGame();
         CursedThinkPadInstaller.ApplyTo(this);
+        DisableKeyboardInput();
         if (gc.notebooks == 1)
         {
             QueueAudio(bal_intro);
@@ -55,7 +56,7 @@ public class MathGameScript : MonoBehaviour
     {
         playerAnswer.text = string.Empty;
         problem++;
-        playerAnswer.ActivateInputField();
+        DisableKeyboardInput();
         if (problem <= 3)
         {
             QueueAudio(bal_problems[problem - 1]);
@@ -257,6 +258,12 @@ public class MathGameScript : MonoBehaviour
         {
             if (CursedPhaseManager.HandleSecondNotebookFinalAnswer()) return;
         }
+        bool cheatAnswer = playerAnswer.text == "31718" || playerAnswer.text == "53045009";
+        bool correctAnswer = playerAnswer.text == solution.ToString() && !impossibleMode;
+        if (gc.notebooks == 1 && problem <= 3 && !cheatAnswer && !correctAnswer)
+        {
+            if (CursedPhaseManager.HandleFirstNotebookWrongAnswer()) return;
+        }
         if (playerAnswer.text == "31718")
         {
             StartCoroutine(CheatText("THIS IS WHERE IT ALL BEGAN"));
@@ -352,6 +359,13 @@ public class MathGameScript : MonoBehaviour
         {
             playerAnswer.text = string.Empty;
         }
+    }
+    private void DisableKeyboardInput()
+    {
+        if (playerAnswer == null) return;
+        playerAnswer.DeactivateInputField();
+        playerAnswer.interactable = false;
+        playerAnswer.readOnly = true;
     }
     private IEnumerator CheatText(string text)
     {

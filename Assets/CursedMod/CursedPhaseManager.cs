@@ -8,7 +8,9 @@ using UnityEngine.UI;
 /// </summary>
 public static class CursedPhaseManager
 {
-    private const string Phase2Key = "CursedHorrorPhase2Unlocked";
+    // Versioned so updating from the earlier test build starts the revised
+    // Phase 1 flow once instead of inheriting its already-unlocked Phase 2.
+    private const string Phase2Key = "CursedHorrorPhase2Unlocked_v2";
     private static bool warningVisible;
 
     public static bool IsPhase2
@@ -27,13 +29,18 @@ public static class CursedPhaseManager
             return false;
         }
 
-        ShowPiracyWarning();
-        return true;
+        return ShowPiracyWarning();
     }
 
-    private static void ShowPiracyWarning()
+    public static bool HandleFirstNotebookWrongAnswer()
     {
-        if (warningVisible) return;
+        if (IsPhase2) return false;
+        return ShowPiracyWarning();
+    }
+
+    private static bool ShowPiracyWarning()
+    {
+        if (warningVisible) return true;
         warningVisible = true;
 
         Texture2D warningTexture = Resources.Load<Texture2D>("CursedMod/PiracyWarningPhase1");
@@ -41,7 +48,7 @@ public static class CursedPhaseManager
         {
             Debug.LogError("Phase 1 warning texture could not be loaded.");
             warningVisible = false;
-            return;
+            return false;
         }
 
         if (Object.FindObjectOfType<EventSystem>() == null)
@@ -75,11 +82,13 @@ public static class CursedPhaseManager
 
         Button button = screen.GetComponent<Button>();
         button.transition = Selectable.Transition.None;
+        button.targetGraphic = image;
         button.onClick.AddListener(UnlockPhase2AndQuit);
 
         CursedMobileInput.Hide();
         AudioListener.pause = true;
         Time.timeScale = 0f;
+        return true;
     }
 
     private static void UnlockPhase2AndQuit()

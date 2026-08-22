@@ -2098,7 +2098,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 3975177663433751356}
   m_TextViewport: {fileID: 21280824767513786}
   m_TextComponent: {fileID: 2277553699473245891}
@@ -2157,7 +2157,7 @@ MonoBehaviour:
   m_Text: 
   m_CaretBlinkRate: 0
   m_CaretWidth: 1
-  m_ReadOnly: 0
+  m_ReadOnly: 1
   m_RichText: 1
   m_GlobalFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_OnFocusSelectAll: 1

@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 using System.Collections.Generic;
@@ -19,12 +20,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.4.2";
+        PlayerSettings.bundleVersion = "1.4.3";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 7;
+        PlayerSettings.Android.bundleVersionCode = 8;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -76,6 +77,27 @@ public static class CursedAndroidSetup
         {
             ApplyAndroidSettings();
         }
+    }
+}
+
+public sealed class CursedBuildValidation : IPreprocessBuildWithReport
+{
+    private const string WarningAssetPath = "Assets/Resources/CursedMod/PiracyWarningPhase1.png";
+
+    public int callbackOrder { get { return -1000; } }
+
+    public void OnPreprocessBuild(BuildReport report)
+    {
+        Texture2D warning = AssetDatabase.LoadAssetAtPath<Texture2D>(WarningAssetPath);
+        if (warning == null)
+        {
+            throw new BuildFailedException("Required Phase 1 warning image is missing: " + WarningAssetPath);
+        }
+        if (warning.width < 1280 || warning.height < 720)
+        {
+            throw new BuildFailedException("Phase 1 warning image has an invalid resolution: " + warning.width + "x" + warning.height);
+        }
+        Debug.Log("Verified Phase 1 warning image: " + warning.width + "x" + warning.height);
     }
 }
 #endif
