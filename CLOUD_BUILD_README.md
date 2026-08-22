@@ -1,6 +1,6 @@
 # Baldi Cursed Classroom — Unity Build Automation adayı
 
-Bu klasör, özgün Unity 2018.3.9f1 mod projesinin **ayrı** bir Unity
+Bu klasör, özgün Unity 2018.3.9f1 mod projesinin **ayrı** bir
 Unity 6000.5.9f1 (Unity 6.5) büyük-sürüm geçiş adayıdır. Özgün 2018.3
 projesi değiştirilmemiştir.
 
