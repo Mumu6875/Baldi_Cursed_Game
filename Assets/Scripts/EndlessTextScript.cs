@@ -1,17 +1,9 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EndlessTextScript : MonoBehaviour
 {
-	private void Start()
+	private void Awake()
 	{
-		text.text = string.Concat(new object[]
-		{
-			text.text,
-			"\nHigh Score: ",
-			PlayerPrefs.GetInt("HighBooks"),
-			" Notebooks"
-		});
+		gameObject.SetActive(false);
 	}
-	public TMP_Text text;
 }
