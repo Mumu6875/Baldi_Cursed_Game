@@ -261,6 +261,19 @@ projesi değiştirilmemiştir.
 - Kullanılmayan NavMesh gizmo alanları gerçek çizim seçeneklerine bağlandı.
 - Android uygulama sürümü 1.13.4, version code 26 olarak güncellendi.
 
+## 1.13.5 — Story-only oyun ve analog joystick
+
+- Ana menüde adı `Endless` içeren tüm düğme, açıklama ve skor nesneleri çalışma
+  anında kapatılır; bütün başlangıç düğmeleri yalnızca Story modunu açar.
+- Oyun denetleyicisi kayıtlı eski seçim ne olursa olsun Story moduna sabitlenir;
+  Endless defter yenilenmesi, skor kaydı ve Baldi öfke döngüsü kaldırılmıştır.
+- Joystick artık dört dijital tuşa çevrilmez; oyuncu gerçek `Vector2` analog
+  yönünü ve büyüklüğünü kullanarak kesintisiz hareket eder.
+- EventSystem sürükleme eşiği kapatıldı, ölü bölge küçültüldü ve Android ham
+  dokunma yedeği eklendi. UI bir `OnDrag` karesini kaçırsa bile yakalanan parmak
+  bırakılana kadar takip edilir.
+- Android uygulama sürümü 1.13.5, version code 27 olarak güncellendi.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -278,7 +291,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.4 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.5 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
