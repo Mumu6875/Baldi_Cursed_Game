@@ -122,7 +122,7 @@ public class CursedMobileInput : MonoBehaviour
         if (canvas == null) return;
         // The Think Pad has its own touch buttons. Hide gameplay controls and
         // suspend raw camera-touch tracking while the math keypad is open.
-        bool thinkPadIsOpen = FindObjectOfType<MathGameScript>() != null;
+        bool thinkPadIsOpen = FindFirstObjectByType<MathGameScript>() != null;
         canvas.enabled = sceneWantsVisible && !thinkPadIsOpen;
         if (thinkPadIsOpen)
         {
@@ -211,7 +211,7 @@ public class CursedMobileInput : MonoBehaviour
 
     private void BuildUI()
     {
-        if (FindObjectOfType<EventSystem>() == null)
+        if (FindFirstObjectByType<EventSystem>() == null)
         {
             GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
             DontDestroyOnLoad(eventSystem);
