@@ -237,7 +237,11 @@ public class MathGameScript : MonoBehaviour
         else
         {
             endDelay = 5f;
-            if (!gc.spoopMode)
+            if (CursedPhaseManager.IsPhase2 && gc.notebooks == 2)
+            {
+                ShowPhase2FinalNotebookMessage();
+            }
+            else if (!gc.spoopMode)
             {
                 questionText.text = "WOW! YOU EXIST!";
             }
@@ -257,6 +261,38 @@ public class MathGameScript : MonoBehaviour
                 questionText3.text = string.Empty;
             }
         }
+    }
+    private void ShowPhase2FinalNotebookMessage()
+    {
+        questionText.text = string.Empty;
+        questionText2.text = string.Empty;
+        questionText3.text = string.Empty;
+
+        GameObject root = mathGame != null ? mathGame : gameObject;
+        if (root.transform.Find("Phase 2 Final Notebook Message") != null) return;
+
+        GameObject messageObject = new GameObject("Phase 2 Final Notebook Message", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+        messageObject.transform.SetParent(root.transform, false);
+        messageObject.transform.SetAsLastSibling();
+
+        RectTransform rect = messageObject.GetComponent<RectTransform>();
+        // Position the message inside the cursed Think Pad's upper LCD panel.
+        rect.anchorMin = new Vector2(0.20f, 0.44f);
+        rect.anchorMax = new Vector2(0.71f, 0.86f);
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        TextMeshProUGUI message = messageObject.GetComponent<TextMeshProUGUI>();
+        message.font = questionText.font;
+        message.fontSize = 22f;
+        message.enableAutoSizing = true;
+        message.fontSizeMin = 12f;
+        message.fontSizeMax = 22f;
+        message.enableWordWrapping = true;
+        message.alignment = TextAlignmentOptions.Center;
+        message.color = Color.red;
+        message.raycastTarget = false;
+        message.text = "If you've found this, then I am truly cursed. I was never meant to be this way! I never wanted to be this... I NEVER WANTED TO BE THIS!";
     }
     public void OKButton()
     {
