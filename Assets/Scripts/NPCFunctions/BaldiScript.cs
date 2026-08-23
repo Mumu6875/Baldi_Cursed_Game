@@ -62,19 +62,6 @@ public class BaldiScript : MonoBehaviour
 		{
 			antiHearing = false;
 		}
-		if (endless) //Only activate if the player is playing on endless mode
-		{
-			if (timeToAnger > 0f) //Decrease the timeToAnger
-			{
-				timeToAnger -= 1f * Time.deltaTime;
-			}
-			else
-			{
-				timeToAnger = angerFrequency; //Set timeToAnger to angerFrequency
-				GetAngry(angerRate); //Get angry based on angerRate
-				angerRate += angerRateRate; //Increase angerRate for next time
-			}
-		}
 	}
 	private void FixedUpdate()
 	{
@@ -176,7 +163,6 @@ public class BaldiScript : MonoBehaviour
 	public float angerRateRate;
 	public float angerFrequency;
 	public float timeToAnger;
-	public bool endless;
 	public Transform player;
 	public Transform wanderTarget;
 	public AILocationSelectorScript wanderer;
