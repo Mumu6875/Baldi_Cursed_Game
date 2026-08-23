@@ -23,6 +23,7 @@ public class CursedMobileInput : MonoBehaviour
 
     private const float LookSensitivity = 0.12f;
     private const float MaxLookPerFrame = 6.5f;
+    private static Sprite circleSprite;
 
     public static bool IsActive
     {
@@ -226,20 +227,29 @@ public class CursedMobileInput : MonoBehaviour
         gameObject.AddComponent<GraphicRaycaster>();
         sceneWantsVisible = true;
 
-        GameObject joystickBase = MakePanel("Movement", transform, new Color(0.08f, 0f, 0f, 0.46f));
+        GameObject joystickBase = MakePanel("Movement", transform, new Color(0.08f, 0f, 0f, 0.56f));
         RectTransform baseRect = joystickBase.GetComponent<RectTransform>();
-        SetRect(baseRect, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(220f, 220f), new Vector2(185f, 185f));
+        SetRect(baseRect, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(320f, 320f), new Vector2(205f, 205f));
+        ConfigureCircularImage(joystickBase.GetComponent<Image>(), new Color(0.08f, 0f, 0f, 0.56f));
+        Outline baseOutline = joystickBase.AddComponent<Outline>();
+        baseOutline.effectColor = new Color(0.9f, 0.08f, 0.08f, 0.72f);
+        baseOutline.effectDistance = new Vector2(4f, -4f);
         CursedJoystick joystick = joystickBase.AddComponent<CursedJoystick>();
-        joystick.radius = 110f;
+        joystick.radius = 100f;
+        joystick.deadZone = 0.12f;
 
         GameObject knob = MakePanel("Knob", joystickBase.transform, new Color(0.68f, 0.04f, 0.04f, 0.78f));
         RectTransform knobRect = knob.GetComponent<RectTransform>();
-        SetRect(knobRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(92f, 92f), Vector2.zero);
+        SetRect(knobRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(118f, 118f), Vector2.zero);
+        ConfigureCircularImage(knob.GetComponent<Image>(), new Color(0.72f, 0.03f, 0.03f, 0.88f));
+        Outline knobOutline = knob.AddComponent<Outline>();
+        knobOutline.effectColor = new Color(1f, 0.34f, 0.2f, 0.82f);
+        knobOutline.effectDistance = new Vector2(3f, -3f);
         knob.GetComponent<Image>().raycastTarget = false;
         joystick.knob = knobRect;
 
-        MakeTextureActionButton("LOOK BACK", "CursedMod/MobileLookBackButton", InputAction.LookBehind, new Vector2(-150f, 330f), new Vector2(0.88f, 0f));
-        MakeTextureActionButton("RUN", "CursedMod/MobileRunButton", InputAction.Run, new Vector2(-150f, 185f), new Vector2(0.88f, 0f));
+        MakeTextureActionButton("LookBackIcon", "CursedMod/MobileLookBackButton", InputAction.LookBehind, new Vector2(-135f, 335f), new Vector2(0.88f, 0f));
+        MakeTextureActionButton("RunIcon", "CursedMod/MobileRunButton", InputAction.Run, new Vector2(-135f, 165f), new Vector2(0.88f, 0f));
         MakeActionButton("GRAB", InputAction.Interact, new Vector2(-430f, 185f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
         MakeActionButton("USE", InputAction.UseItem, new Vector2(-430f, 330f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
         // Top-center placement avoids covering the third inventory slot.
@@ -269,29 +279,71 @@ public class CursedMobileInput : MonoBehaviour
         text.raycastTarget = false;
     }
 
-    private void MakeTextureActionButton(string fallbackLabel, string resourcePath, InputAction action, Vector2 position, Vector2 anchor)
+    private void MakeTextureActionButton(string objectName, string resourcePath, InputAction action, Vector2 position, Vector2 anchor)
     {
         Texture2D texture = Resources.Load<Texture2D>(resourcePath);
         if (texture == null)
         {
             Debug.LogError("Mobile button texture could not be loaded: " + resourcePath);
-            MakeActionButton(fallbackLabel, action, position, anchor, new Vector2(255f, 127f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
+            MakeActionButton(string.Empty, action, position, anchor, new Vector2(150f, 150f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
             return;
         }
 
-        GameObject buttonObject = new GameObject(fallbackLabel, typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+        GameObject buttonObject = MakePanel(objectName, transform, new Color(0.12f, 0f, 0f, 0.58f));
         buttonObject.transform.SetParent(transform, false);
         RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
-        SetRect(buttonRect, anchor, anchor, new Vector2(255f, 127f), position);
+        SetRect(buttonRect, anchor, anchor, new Vector2(150f, 150f), position);
+        ConfigureCircularImage(buttonObject.GetComponent<Image>(), new Color(0.12f, 0f, 0f, 0.58f));
+        Outline outline = buttonObject.AddComponent<Outline>();
+        outline.effectColor = new Color(0.9f, 0.1f, 0.08f, 0.68f);
+        outline.effectDistance = new Vector2(3f, -3f);
         lookBlockedRects.Add(buttonRect);
 
-        RawImage image = buttonObject.GetComponent<RawImage>();
+        GameObject iconObject = new GameObject("Icon", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+        iconObject.transform.SetParent(buttonObject.transform, false);
+        RectTransform iconRect = iconObject.GetComponent<RectTransform>();
+        SetRect(iconRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        iconRect.offsetMin = new Vector2(12f, 12f);
+        iconRect.offsetMax = new Vector2(-12f, -12f);
+        RawImage image = iconObject.GetComponent<RawImage>();
         image.texture = texture;
         image.color = Color.white;
-        image.raycastTarget = true;
+        image.raycastTarget = false;
 
         CursedMobileHoldButton button = buttonObject.AddComponent<CursedMobileHoldButton>();
         button.action = action;
+    }
+
+    private static void ConfigureCircularImage(Image image, Color color)
+    {
+        if (circleSprite == null)
+        {
+            const int size = 128;
+            Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            texture.name = "CursedMobileCircle";
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.filterMode = FilterMode.Bilinear;
+            Color32[] pixels = new Color32[size * size];
+            float center = (size - 1) * 0.5f;
+            float radius = center - 1f;
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float distance = Vector2.Distance(new Vector2(x, y), new Vector2(center, center));
+                    byte alpha = (byte)Mathf.RoundToInt(Mathf.Clamp01(radius + 1f - distance) * 255f);
+                    pixels[y * size + x] = new Color32(255, 255, 255, alpha);
+                }
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply(false, true);
+            circleSprite = Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), 100f);
+            circleSprite.name = "CursedMobileCircleSprite";
+        }
+
+        image.sprite = circleSprite;
+        image.type = Image.Type.Simple;
+        image.color = color;
     }
 
     private static GameObject MakePanel(string name, Transform parent, Color color)
@@ -316,10 +368,35 @@ public class CursedMobileInput : MonoBehaviour
     {
         public RectTransform knob;
         public float radius;
+        public float deadZone;
+        private int activePointerId = int.MinValue;
 
-        public void OnPointerDown(PointerEventData eventData) { UpdatePosition(eventData); }
-        public void OnDrag(PointerEventData eventData) { UpdatePosition(eventData); }
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (activePointerId != int.MinValue) return;
+            activePointerId = eventData.pointerId;
+            UpdatePosition(eventData);
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            if (eventData.pointerId == activePointerId) UpdatePosition(eventData);
+        }
+
         public void OnPointerUp(PointerEventData eventData)
+        {
+            if (eventData.pointerId != activePointerId) return;
+            activePointerId = int.MinValue;
+            ResetJoystick();
+        }
+
+        private void OnDisable()
+        {
+            activePointerId = int.MinValue;
+            ResetJoystick();
+        }
+
+        private void ResetJoystick()
         {
             moveVector = Vector2.zero;
             if (knob != null) knob.anchoredPosition = Vector2.zero;
@@ -330,7 +407,16 @@ public class CursedMobileInput : MonoBehaviour
             Vector2 local;
             RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)transform, eventData.position, eventData.pressEventCamera, out local);
             local = Vector2.ClampMagnitude(local, radius);
-            moveVector = local / radius;
+            float normalizedMagnitude = local.magnitude / Mathf.Max(radius, 1f);
+            if (normalizedMagnitude <= deadZone)
+            {
+                moveVector = Vector2.zero;
+            }
+            else
+            {
+                float adjustedMagnitude = Mathf.InverseLerp(deadZone, 1f, normalizedMagnitude);
+                moveVector = local.normalized * adjustedMagnitude;
+            }
             if (knob != null) knob.anchoredPosition = local;
         }
     }

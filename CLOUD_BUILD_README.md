@@ -150,6 +150,19 @@ projesi değiştirilmemiştir.
 - Build doğrulaması sesin mono ve `0,5–1,0 sn` arasında olduğunu kontrol eder.
   Baldi'nin mevcut 12/500 birimlik 3B ses mesafeleri değiştirilmemiştir.
 
+## 1.8.0 — Mobil joystick ve ikon yenilemesi
+
+- Sol joystick'in dokunma alanı `220x220` yerine `320x320` yapıldı; düğme
+  `118x118` boyutuna çıkarıldı ve dairesel kırmızı görsel katmanlar eklendi.
+- `0,12` merkez ölü bölgesi ve ölü bölge sonrası yeniden ölçekleme ile küçük
+  parmak titreşimleri engellenirken tam hareket hızı korunur.
+- Joystick artık yalnızca ilk dokunan parmağı takip eder; başka bir parmakla
+  kamera veya aksiyon butonları kullanıldığında yön aniden değişmez.
+- Run ve Look Back yazıları görsellerden tamamen kaldırıldı. Yerlerine şeffaf
+  zeminli koşma ve dikiz aynası ikonları, `150x150` dairesel dokunma alanlarında
+  kullanılır.
+- Build doğrulaması iki mobil ikonun da kare ve en az `240x240` olduğunu kontrol eder.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -167,7 +180,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.7.2 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.8.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.7.2";
+        PlayerSettings.bundleVersion = "1.8.0";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 16;
+        PlayerSettings.Android.bundleVersionCode = 17;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -124,11 +124,10 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
                 throw new BuildFailedException("Mobile button image could not be imported: " + buttonPath);
             }
 
-            // Unity's default NPOT import setting may convert the 255x127 source
-            // image to 256x128. Validate useful imported dimensions and aspect
-            // ratio instead of rejecting Unity's expected conversion.
+            // The icon-only controls are square RGBA textures. Validate useful
+            // imported dimensions and a square aspect ratio.
             float aspect = (float)button.width / Mathf.Max(button.height, 1);
-            if (button.width < 240 || button.height < 120 || aspect < 1.9f || aspect > 2.1f)
+            if (button.width < 240 || button.height < 240 || aspect < 0.95f || aspect > 1.05f)
             {
                 throw new BuildFailedException("Mobile button image has invalid imported dimensions: " + buttonPath + " (" + button.width + "x" + button.height + ")");
             }
