@@ -2,24 +2,11 @@
 
 public class EndlessNotebookScript : MonoBehaviour
 {
-	private void Start()
+	private void Awake()
 	{
-		gc = GameObject.Find("Game Controller").GetComponent<GameControllerScript>(); //Find the game controller object
-		player = GameObject.Find("Player").GetComponent<Transform>(); //Find the player object
-	}
-	private void Update()
-	{
-		if (Input.GetMouseButtonDown(0)) //If left clicked
-		{
-			Ray ray = Camera.main.ScreenPointToRay(new Vector3((float)(Screen.width / 2), (float)(Screen.height / 2), 0f));
-			RaycastHit raycastHit;
-			if (Physics.Raycast(ray, out raycastHit) && (raycastHit.transform.tag == "Notebook" & Vector3.Distance(player.position, transform.position) < openingDistance)) //If it is a notebook
-			{
-				gameObject.SetActive(false); //Disable the object being clicked
-				gc.CollectNotebook(); //Collect the notebook
-				learningGame.SetActive(true); //Activate the learning game
-			}
-		}
+		// Kept only so old serialized scenes do not report a Missing Script.
+		// Endless-only notebooks are disabled in the story-only build.
+		gameObject.SetActive(false);
 	}
 	public float openingDistance;
 	public GameControllerScript gc;
