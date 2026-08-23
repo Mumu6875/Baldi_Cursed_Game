@@ -119,7 +119,7 @@ public class CursedHorrorBootstrap : MonoBehaviour
             CursedMobileInput.Hide();
         }
 
-        if (scene.name == "GameOver" && horrorActive)
+        if (scene.name == "GameOver" && CursedPhaseManager.IsPhase2)
         {
             InstallGameOverImage();
         }
@@ -323,6 +323,18 @@ public class CursedHorrorBootstrap : MonoBehaviour
         raw.texture = cursedBaldiTexture;
         raw.raycastTarget = false;
         face.AddComponent<CursedJumpscarePulse>();
+        StartCoroutine(QuitAfterPhase2Jumpscare());
+    }
+
+    private IEnumerator QuitAfterPhase2Jumpscare()
+    {
+        // Keep the jumpscare visible before closing the Phase 2 game session.
+        yield return new WaitForSecondsRealtime(3f);
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private static void Stretch(RectTransform rect)
