@@ -8,22 +8,6 @@ public class NotebookScript : MonoBehaviour
 	}
 	private void Update()
 	{
-		if (gc.mode == "endless")
-		{
-			if (respawnTime > 0f)
-			{
-				if ((transform.position - player.position).magnitude > 60f)
-				{
-					respawnTime -= Time.deltaTime;
-				}
-			}
-			else if (!up)
-			{
-				transform.position = new Vector3(transform.position.x, 4f, transform.position.z);
-				up = true;
-				audioDevice.Play();
-			}
-		}
 		if (Singleton<InputManager>.Instance.GetActionKey(InputAction.Interact) && Time.timeScale != 0f)
 		{
 			Ray ray = Camera.main.ScreenPointToRay(new Vector3((float)(Screen.width / 2), (float)(Screen.height / 2), 0f));
