@@ -240,6 +240,16 @@ projesi değiştirilmemiştir.
   böylece Unity TextureImporter `File could not be read` hatası vermeden içe aktarabilir.
 - Yüklenen Git blob kimliği yerel dosyanın Git blob kimliğiyle birebir doğrulanır.
 
+## 1.13.3 — NPOT tam ekran görsel düzeltmesi
+
+- Unity Cloud Build'in 1672x941 Phase 2, Phase 3 ve Phase 4 görsellerini varsayılan
+  NPOT ayarıyla 2048x1024'e çevirmesi engellendi.
+- Derleme öncesi doğrulayıcı bütün CursedMod dokularında `NPOT Scale = None`
+  uygular; böylece kaynak çözünürlük korunur.
+- Bir görsel yine yüklenemezse hata mesajı artık gerçek içe aktarılmış ölçüyü veya
+  `TextureImporter` null sonucunu açıkça bildirir.
+- Android uygulama sürümü 1.13.3, version code 25 olarak güncellendi.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -257,7 +267,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.2 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.3 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
