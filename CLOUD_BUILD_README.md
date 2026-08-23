@@ -250,6 +250,17 @@ projesi değiştirilmemiştir.
   `TextureImporter` null sonucunu açıkça bildirir.
 - Android uygulama sürümü 1.13.3, version code 25 olarak güncellendi.
 
+## 1.13.4 — Unity 6 sıfır proje uyarısı temizliği
+
+- Generic `Singleton<T>` içindeki geçersiz çalışma zamanı başlangıç metodu,
+  generic olmayan ortak bir yaşam döngüsü sınıfına taşındı.
+- Eski `FindObjectOfType`, `FindObjectsOfType`, `Rigidbody.velocity`, TMP kelime
+  sarma/kerning ve font bilgisi API'leri Unity 6 karşılıklarına geçirildi.
+- Editör ayarları `NamedBuildTarget.Android` kullanır; Android scripting backend
+  kalıcı olarak IL2CPP, mimariler ARMv7 + ARM64 olarak sabitlenmiştir.
+- Kullanılmayan NavMesh gizmo alanları gerçek çizim seçeneklerine bağlandı.
+- Android uygulama sürümü 1.13.4, version code 26 olarak güncellendi.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -267,7 +278,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.3 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.4 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
