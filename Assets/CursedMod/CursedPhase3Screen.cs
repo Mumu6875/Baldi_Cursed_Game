@@ -61,7 +61,7 @@ public sealed class CursedPhase3Screen : MonoBehaviour
         AudioListener.pause = true;
         Time.timeScale = 0f;
 
-        if (FindObjectOfType<EventSystem>() == null)
+        if (FindFirstObjectByType<EventSystem>() == null)
         {
             new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
         }
