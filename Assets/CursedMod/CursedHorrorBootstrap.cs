@@ -339,7 +339,10 @@ public static class CursedThinkPadInstaller
     public static void ApplyTo(MathGameScript math)
     {
         if (math == null) return;
-        if (!CursedHorrorBootstrap.HorrorActive) return;
+        // Phase 2 is persisted between launches, while HorrorActive is only a
+        // runtime flag that is raised after an answer is submitted. Apply the
+        // skin as soon as the saved horror phase is active.
+        if (!CursedPhaseManager.IsPhase2) return;
         Texture2D texture = Resources.Load<Texture2D>("CursedMod/CursedThinkPad");
         if (texture == null) return;
         GameObject root = math.mathGame != null ? math.mathGame : math.gameObject;
@@ -347,7 +350,11 @@ public static class CursedThinkPadInstaller
 
         GameObject skin = new GameObject("Cursed Think Pad Skin", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
         skin.transform.SetParent(root.transform, false);
-        skin.transform.SetAsFirstSibling();
+        // The stock YCTP background is an opaque child of this canvas. Putting
+        // the cursed skin first leaves it hidden underneath that background.
+        // Render it last, but keep raycasts disabled so the original keypad and
+        // OK button underneath remain fully functional.
+        skin.transform.SetAsLastSibling();
         RectTransform rect = skin.GetComponent<RectTransform>();
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
