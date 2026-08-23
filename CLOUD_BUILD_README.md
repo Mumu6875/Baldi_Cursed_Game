@@ -232,6 +232,14 @@ projesi değiştirilmemiştir.
 - Kapı, çerçevesi, etiketi ve portal bileşeni yalnızca son çıkış kilitlendiği anda
   birlikte oluşturulur. Böylece oyuncu olay başlamadan Door 99'u göremez veya kullanamaz.
 
+## 1.13.2 — Phase 2 bitiş PNG bütünlük düzeltmesi
+
+- Bulut deposuna daha önce eksik aktarılan `Phase2Completion.png` yeniden kodlandı
+  ve tam `1672x941` çözünürlükte geçerli bir PNG olarak değiştirildi.
+- Görselin düzeni ve boş kod ekranı korunurken dosya boyutu güvenli biçimde küçültüldü;
+  böylece Unity TextureImporter `File could not be read` hatası vermeden içe aktarabilir.
+- Yüklenen Git blob kimliği yerel dosyanın Git blob kimliğiyle birebir doğrulanır.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -249,7 +257,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.1 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.2 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
