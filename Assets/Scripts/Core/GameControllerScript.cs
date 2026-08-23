@@ -10,11 +10,9 @@ public class GameControllerScript : MonoBehaviour
 	{
 		cullingMask = playerCamera.cullingMask; // Changes cullingMask in the Camera
 		audioDevice = GetComponent<AudioSource>(); //Get the Audio Source
-		mode = PlayerPrefs.GetString("CurrentMode"); //Get the current mode
-		if (mode == "endless") //If it is endless mode
-		{
-			baldiScrpt.endless = true; //Set Baldi use his slightly changed endless anger system
-		}
+		mode = "story";
+		PlayerPrefs.SetString("CurrentMode", mode);
+		if (highScoreText != null) highScoreText.SetActive(false);
 		schoolMusic.Play(); //Play the school music
 		LockMouse(); //Prevent the mouse from moving
 		UpdateNotebookCount(); //Update the notebook count
@@ -103,11 +101,6 @@ public class GameControllerScript : MonoBehaviour
 
 		if (player.gameOver)
 		{
-			if (mode == "endless" && notebooks > PlayerPrefs.GetInt("HighBooks") && !highScoreText.activeSelf)
-			{
-				highScoreText.SetActive(true);
-			}
-
 			Time.timeScale = 0f;
 			gameOverDelay -= Time.unscaledDeltaTime * 0.5f;
 			playerCamera.farClipPlane = gameOverDelay * 400f; //Set camera farClip 
@@ -115,14 +108,6 @@ public class GameControllerScript : MonoBehaviour
 
 			if (gameOverDelay <= 0f)
 			{
-				if (mode == "endless")
-				{
-					if (notebooks > PlayerPrefs.GetInt("HighBooks"))
-					{
-						PlayerPrefs.SetInt("HighBooks", notebooks);
-					}
-					PlayerPrefs.SetInt("CurrentBooks", notebooks);
-				}
 				Time.timeScale = 1f;
 				SceneManager.LoadScene(GameOverScene);
 			}
@@ -137,16 +122,9 @@ public class GameControllerScript : MonoBehaviour
 	}
 	private void UpdateNotebookCount()
 	{
-		if (mode == "story")
-		{
-			notebookCount.text = notebooks.ToString() + "/7 Notebooks";
-		}
-		else
-		{
-			notebookCount.text = notebooks.ToString() + " Notebooks";
-		}
+		notebookCount.text = notebooks.ToString() + "/7 Notebooks";
 
-		if (notebooks == 7 & mode == "story")
+		if (notebooks == 7)
 		{
 			ActivateFinaleMode();
 		}
@@ -263,7 +241,7 @@ public class GameControllerScript : MonoBehaviour
 			quarter.SetActive(true);
 			tutorBaldi.PlayOneShot(aud_Prize);
 		}
-		else if (notebooks == 7 & mode == "story") // Plays the all 7 notebook sound
+		else if (notebooks == 7) // Plays the all 7 notebook sound
 		{
 			audioDevice.PlayOneShot(aud_AllNotebooks, 0.8f);
 		}
