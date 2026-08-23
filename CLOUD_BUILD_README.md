@@ -163,6 +163,18 @@ projesi değiştirilmemiştir.
   kullanılır.
 - Build doğrulaması iki mobil ikonun da kare ve en az `240x240` olduğunu kontrol eder.
 
+## 1.9.0 — Phase 2 HELP ME çıkış tabelaları
+
+- Okul sahnesindeki gerçek çıkış tabelalarının kod ve sahne bağlantısı incelendi:
+  beş `ExitSignSprite` nesnesi özgün `Billboards/ExitSign.png` sprite'ını kullanır.
+- Imagegen ile özgün tabelanın biçimi referans alınarak kırmızı, okunaklı ve
+  bozulmuş `HELP ME` yazılı `128x128` yeni bir sprite üretildi.
+- Yeni sprite yalnızca kalıcı Phase 2 kilidi açıkken çalışma zamanında uygulanır;
+  Phase 1'de özgün `EXIT` tabelaları değişmeden kalır.
+- Harita yön posterleri (`MapExits`) ve çıkışların tetikleyici/oynanış kodları
+  değiştirilmez. Build doğrulaması yeni tabelanın mevcut ve tam `128x128`
+  olduğunu kontrol eder.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -180,7 +192,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.8.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.9.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

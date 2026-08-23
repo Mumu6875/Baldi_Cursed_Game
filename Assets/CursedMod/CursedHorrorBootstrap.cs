@@ -12,7 +12,9 @@ public class CursedHorrorBootstrap : MonoBehaviour
     private static CursedHorrorBootstrap instance;
     private Texture2D cursedBaldiTexture;
     private Texture2D cursedThinkPadTexture;
+    private Texture2D helpMeExitTexture;
     private Sprite cursedBaldiSprite;
+    private Sprite helpMeExitSprite;
     private Image dangerFlash;
     private float pulse;
     private bool horrorActive;
@@ -40,10 +42,17 @@ public class CursedHorrorBootstrap : MonoBehaviour
     {
         cursedBaldiTexture = Resources.Load<Texture2D>("CursedMod/CursedBaldi");
         cursedThinkPadTexture = Resources.Load<Texture2D>("CursedMod/CursedThinkPad");
+        helpMeExitTexture = Resources.Load<Texture2D>("CursedMod/HelpMeExitSign");
         if (cursedBaldiTexture != null)
         {
             cursedBaldiSprite = Sprite.Create(cursedBaldiTexture, new Rect(0f, 0f, cursedBaldiTexture.width, cursedBaldiTexture.height), new Vector2(0.5f, 0.02f), 256f);
             cursedBaldiSprite.name = "Cursed Baldi Runtime Sprite";
+        }
+        if (helpMeExitTexture != null)
+        {
+            // Match the original ExitSign.png import: centered pivot and 100 pixels per unit.
+            helpMeExitSprite = Sprite.Create(helpMeExitTexture, new Rect(0f, 0f, helpMeExitTexture.width, helpMeExitTexture.height), new Vector2(0.5f, 0.5f), 100f);
+            helpMeExitSprite.name = "Phase 2 Help Me Exit Sign";
         }
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -77,6 +86,10 @@ public class CursedHorrorBootstrap : MonoBehaviour
         {
             CursedMobileInput.EnsureForGameplayScene();
             CursedFinalExitSequence.EnsureInstalled();
+            if (CursedPhaseManager.IsPhase2)
+            {
+                PatchExitSigns();
+            }
             if (horrorActive)
             {
                 PatchBaldiVisuals();
@@ -94,6 +107,27 @@ public class CursedHorrorBootstrap : MonoBehaviour
         {
             InstallGameOverImage();
         }
+    }
+
+    private void PatchExitSigns()
+    {
+        if (helpMeExitSprite == null)
+        {
+            Debug.LogError("Phase 2 HELP ME exit sign texture could not be loaded.");
+            return;
+        }
+
+        int patched = 0;
+        SpriteRenderer[] renderers = Resources.FindObjectsOfTypeAll<SpriteRenderer>();
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            SpriteRenderer renderer = renderers[i];
+            if (!renderer.gameObject.scene.IsValid()) continue;
+            if (renderer.gameObject.name != "ExitSignSprite") continue;
+            renderer.sprite = helpMeExitSprite;
+            patched++;
+        }
+        Debug.Log("Phase 2 HELP ME exit signs applied: " + patched);
     }
 
     private static void ApplyPhase2MusicSpeed(Scene scene)
