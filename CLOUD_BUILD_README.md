@@ -274,6 +274,18 @@ projesi değiştirilmemiştir.
   bırakılana kadar takip edilir.
 - Android uygulama sürümü 1.13.5, version code 27 olarak güncellendi.
 
+## 1.13.6 — Endless modunun tamamen kaldırılması
+
+- Ana menüdeki iki eski Endless düğme takımı, açıklama metinleri ve bağlantılı
+  Unity bileşenleri sahne YAML'ından fiziksel olarak kaldırıldı.
+- Endless defter, skor ve menü betikleri ile üç kullanılmayan Endless simgesi
+  projeden silindi; sahnelerde eksik script veya bozuk GUID bırakılmadı.
+- School sahnesindeki eski yüksek skor paneli ve Game Over sahnesindeki Endless
+  skor paneli çocuk nesneleriyle birlikte kaldırıldı.
+- `CurrentMode`, `CurrentBooks` ve `HighBooks` kayıt yolları ile eski serialized
+  Endless alanları koddan ve sahnelerden temizlendi.
+- Android uygulama sürümü 1.13.6, version code 28 olarak güncellendi.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -291,7 +303,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.5 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.6 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

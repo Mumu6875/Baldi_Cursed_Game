@@ -65,11 +65,6 @@ public class CursedHorrorBootstrap : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "MainMenu")
-        {
-            RemoveEndlessModeFromMenu(scene);
-        }
-
         if (CursedPhaseManager.IsPhase4)
         {
             horrorActive = false;
@@ -93,28 +88,6 @@ public class CursedHorrorBootstrap : MonoBehaviour
         }
         ApplyPhase2MusicSpeed(scene);
         StartCoroutine(PatchSceneAfterActivation(scene));
-    }
-
-    private static void RemoveEndlessModeFromMenu(Scene scene)
-    {
-        PlayerPrefs.SetString("CurrentMode", "story");
-        PlayerPrefs.DeleteKey("HighBooks");
-        PlayerPrefs.DeleteKey("CurrentBooks");
-
-        GameObject[] roots = scene.GetRootGameObjects();
-        for (int i = 0; i < roots.Length; i++)
-        {
-            Transform[] transforms = roots[i].GetComponentsInChildren<Transform>(true);
-            for (int j = 0; j < transforms.Length; j++)
-            {
-                GameObject candidate = transforms[j].gameObject;
-                if (candidate.name.IndexOf("Endless", System.StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    candidate.SetActive(false);
-                }
-            }
-        }
-        PlayerPrefs.Save();
     }
 
     private IEnumerator PatchSceneAfterActivation(Scene scene)

@@ -10,9 +10,6 @@ public class GameControllerScript : MonoBehaviour
 	{
 		cullingMask = playerCamera.cullingMask; // Changes cullingMask in the Camera
 		audioDevice = GetComponent<AudioSource>(); //Get the Audio Source
-		mode = "story";
-		PlayerPrefs.SetString("CurrentMode", mode);
-		if (highScoreText != null) highScoreText.SetActive(false);
 		schoolMusic.Play(); //Play the school music
 		LockMouse(); //Prevent the mouse from moving
 		UpdateNotebookCount(); //Update the notebook count
@@ -587,7 +584,6 @@ public class GameControllerScript : MonoBehaviour
 	public GameObject quarter;
 	public AudioSource tutorBaldi;
 	public RectTransform boots;
-	public string mode;
 	public int notebooks;
 	public int failedNotebooks;
 	public bool spoopMode;
@@ -620,7 +616,6 @@ public class GameControllerScript : MonoBehaviour
 	public TMP_Text notebookCount;
 	public GameObject pauseMenu;
 	public string ExitGameScene;
-	public GameObject highScoreText;
 	public GameObject warning;
 	public GameObject reticle;
 	public RectTransform itemSelect;
