@@ -97,7 +97,7 @@ public class CursedHorrorBootstrap : MonoBehaviour
         // Repeat after one frame as a safety net for objects instantiated by Start().
         ApplyPhase2MusicSpeed(scene);
 
-        bool gameplay = FindObjectOfType<PlayerScript>() != null || FindObjectOfType<PlayerMovement>() != null;
+        bool gameplay = FindFirstObjectByType<PlayerScript>() != null || FindFirstObjectByType<PlayerMovement>() != null;
         if (gameplay)
         {
             CursedMobileInput.EnsureForGameplayScene();
@@ -164,7 +164,7 @@ public class CursedHorrorBootstrap : MonoBehaviour
             }
         }
 
-        GameControllerScript controller = FindObjectOfType<GameControllerScript>();
+        GameControllerScript controller = FindFirstObjectByType<GameControllerScript>();
         if (controller != null)
         {
             // schoolMusic is heard when gameplay begins; learnMusic is the
@@ -284,8 +284,8 @@ public class CursedHorrorBootstrap : MonoBehaviour
     private void Update()
     {
         if (dangerFlash == null) return;
-        BaldiScript baldi = FindObjectOfType<BaldiScript>();
-        PlayerScript player = FindObjectOfType<PlayerScript>();
+        BaldiScript baldi = FindFirstObjectByType<BaldiScript>();
+        PlayerScript player = FindFirstObjectByType<PlayerScript>();
         float targetAlpha = 0f;
         if (baldi != null && player != null && baldi.gameObject.activeInHierarchy)
         {
