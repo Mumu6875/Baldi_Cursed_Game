@@ -24,6 +24,7 @@ public class CursedFinalExitSequence : MonoBehaviour
     private Material wallMaterial;
     private Material floorMaterial;
     private bool completionVisible;
+    private string completionCode;
 
     public static void EnsureInstalled()
     {
@@ -392,6 +393,8 @@ public class CursedFinalExitSequence : MonoBehaviour
     {
         if (completionVisible) return;
         completionVisible = true;
+        completionCode = GenerateFourDigitCode();
+        CursedPhaseManager.UnlockPhase3(completionCode);
 
         Texture2D completionTexture = Resources.Load<Texture2D>("CursedMod/Phase2Completion");
         if (completionTexture == null)
@@ -457,7 +460,7 @@ public class CursedFinalExitSequence : MonoBehaviour
         codeRect.offsetMax = Vector2.zero;
 
         Text codeText = codeObject.GetComponent<Text>();
-        codeText.text = GenerateFourDigitCode();
+        codeText.text = completionCode;
         codeText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         codeText.fontSize = 132;
         codeText.fontStyle = FontStyle.Bold;
@@ -471,7 +474,7 @@ public class CursedFinalExitSequence : MonoBehaviour
         Outline outline = codeObject.GetComponent<Outline>();
         outline.effectColor = new Color(0.48f, 0f, 0f, 0.92f);
         outline.effectDistance = new Vector2(3f, -3f);
-        Debug.Log("Phase 2 completion code: " + codeText.text);
+        Debug.Log("Phase 2 completion code saved for Phase 3: " + codeText.text);
     }
 
     private static string GenerateFourDigitCode()

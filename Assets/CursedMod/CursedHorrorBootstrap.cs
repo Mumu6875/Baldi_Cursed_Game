@@ -65,6 +65,14 @@ public class CursedHorrorBootstrap : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if (CursedPhaseManager.IsPhase3)
+        {
+            horrorActive = false;
+            RemoveDangerOverlay();
+            CursedPhase3Screen.Show();
+            return;
+        }
+
         if (scene.name == "MainMenu" || scene.name == "Warning")
         {
             horrorActive = false;

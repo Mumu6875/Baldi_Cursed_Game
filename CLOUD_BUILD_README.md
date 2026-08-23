@@ -187,6 +187,20 @@ projesi değiştirilmemiştir.
   ekranın herhangi bir yerine dokunulduğunda uygulama kapanır.
 - Build doğrulaması bitiş görselinin mevcut ve tam `1672x941` olduğunu kontrol eder.
 
+## 1.11.0 — Phase 3 parola ekranı
+
+- Phase 2 bitiş ekranında üretilen dört haneli kod PlayerPrefs'e metin olarak
+  kaydedilir; böylece `0007` gibi baştaki sıfırlar Phase 3'te korunur.
+- Kod gösterildiği anda Phase 3 kalıcı olarak açılır. Sonraki uygulama açılışında
+  ana menü yerine yalnızca tam ekran Phase 3 arayüzü gösterilir.
+- Imagegen arka planında yüklenen oyuncu üstte, mevcut Cursed You Can Think Pad
+  ortada yer alır. Yeşil ekrana kırmızı `Enter the password` istemi çizilir.
+- Görseldeki `0–9`, eksi/geri silme ve `OK` tuşlarının üstüne gerçek dokunmatik
+  buton bölgeleri yerleştirilmiştir; Android klavyesi çağrılmaz.
+- `OK` ile gönderilen doğru veya yanlış parola uygulamayı doğrudan kapatır.
+  Hiçbir işlem yapılmazsa ekran, ölçeklenmemiş zamanla tam `66,6` saniye sonra kapanır.
+- Build doğrulaması Phase 3 görselinin mevcut ve tam `1672x941` olduğunu kontrol eder.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -204,7 +218,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.10.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.11.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

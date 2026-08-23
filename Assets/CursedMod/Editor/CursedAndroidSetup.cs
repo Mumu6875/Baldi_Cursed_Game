@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.10.0";
+        PlayerSettings.bundleVersion = "1.11.0";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 19;
+        PlayerSettings.Android.bundleVersionCode = 20;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -87,6 +87,7 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
     private const string RulerAudioAssetPath = "Assets/Resources/CursedMod/BaldiRulerLoud.ogg";
     private const string HelpMeExitAssetPath = "Assets/Resources/CursedMod/HelpMeExitSign.png";
     private const string Phase2CompletionAssetPath = "Assets/Resources/CursedMod/Phase2Completion.png";
+    private const string Phase3PasswordAssetPath = "Assets/Resources/CursedMod/Phase3Password.png";
     private static readonly string[] MobileButtonAssetPaths =
     {
         "Assets/Resources/CursedMod/MobileLookBackButton.png",
@@ -136,6 +137,18 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
             throw new BuildFailedException("Phase 2 completion image must be exactly 1672x941: " + Phase2CompletionAssetPath);
         }
         Debug.Log("Verified Phase 2 completion image: " + completion.width + "x" + completion.height);
+
+        if (!File.Exists(Phase3PasswordAssetPath))
+        {
+            throw new BuildFailedException("Required Phase 3 password image is missing: " + Phase3PasswordAssetPath);
+        }
+        AssetDatabase.ImportAsset(Phase3PasswordAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+        Texture2D phase3 = AssetDatabase.LoadAssetAtPath<Texture2D>(Phase3PasswordAssetPath);
+        if (phase3 == null || phase3.width != 1672 || phase3.height != 941)
+        {
+            throw new BuildFailedException("Phase 3 password image must be exactly 1672x941: " + Phase3PasswordAssetPath);
+        }
+        Debug.Log("Verified Phase 3 password image: " + phase3.width + "x" + phase3.height);
 
         foreach (string buttonPath in MobileButtonAssetPaths)
         {

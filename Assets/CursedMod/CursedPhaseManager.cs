@@ -3,19 +3,43 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// Persists the two-stage horror flow between Android launches.
-/// Phase 1 ends with the warning screen; tapping it unlocks Phase 2 and quits.
+/// Persists the three-stage horror flow between Android launches.
+/// Phase 1 unlocks Phase 2; finishing Phase 2 stores the password and unlocks Phase 3.
 /// </summary>
 public static class CursedPhaseManager
 {
     // Versioned so updating from the earlier test build starts the revised
     // Phase 1 flow once instead of inheriting its already-unlocked Phase 2.
     private const string Phase2Key = "CursedHorrorPhase2Unlocked_v2";
+    private const string Phase3Key = "CursedHorrorPhase3Unlocked_v1";
+    private const string Phase3PasswordKey = "CursedHorrorPhase3Password_v1";
     private static bool warningVisible;
 
     public static bool IsPhase2
     {
         get { return PlayerPrefs.GetInt(Phase2Key, 0) == 1; }
+    }
+
+    public static bool IsPhase3
+    {
+        get { return PlayerPrefs.GetInt(Phase3Key, 0) == 1; }
+    }
+
+    public static string Phase3Password
+    {
+        get { return PlayerPrefs.GetString(Phase3PasswordKey, "0000"); }
+    }
+
+    public static void UnlockPhase3(string password)
+    {
+        if (string.IsNullOrEmpty(password) || password.Length != 4)
+        {
+            Debug.LogError("Phase 3 password must contain exactly four digits.");
+            return;
+        }
+        PlayerPrefs.SetString(Phase3PasswordKey, password);
+        PlayerPrefs.SetInt(Phase3Key, 1);
+        PlayerPrefs.Save();
     }
 
     /// <summary>
