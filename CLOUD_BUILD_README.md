@@ -214,6 +214,17 @@ projesi değiştirilmemiştir.
   uygulama kapanır; ana menü veya normal oyun arayüzü gösterilmez.
 - Build doğrulaması Phase 4 görselinin mevcut ve tam `1672x941` olduğunu kontrol eder.
 
+## 1.13.0 — Kafeterya Door 99
+
+- Phase 2 başladığında kafeteryanın kuzey duvarının merkezine, sahne adı gerçekten
+  `99` olan koyu renkli ve kırmızı `99` etiketli özel bir kapı eklenir.
+- Eski gizli `99` kara tahtasını bulup en yakın normal kapıyı seçen yaklaşım tamamen
+  kaldırıldı. Böylece korku alanı başka bir sınıf veya koridor kapısında açılamaz.
+- Özel kapı başlangıçta yalnızca görünürdür. Son çıkış kilitlendikten sonra beyaz sis
+  ve ışınlanma tetikleyicisi yalnızca bu kapıda etkinleştirilir.
+- Korku alanının geometrisi harita dışındaki güvenli bölgede oluşturulmaya devam eder;
+  kafeterya kapısı bu alana açılan tek giriş olarak çalışır.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -231,7 +242,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.12.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

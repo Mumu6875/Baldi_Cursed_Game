@@ -6,8 +6,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// Replaces the normal fourth-exit victory with a sealed exit and turns the
-/// existing Room 99 entrance into a foggy runtime-generated maze.
+/// Replaces the normal fourth-exit victory with a sealed exit and connects a
+/// dedicated cafeteria Door 99 to the foggy runtime-generated nightmare area.
 /// </summary>
 public class CursedFinalExitSequence : MonoBehaviour
 {
@@ -23,6 +23,9 @@ public class CursedFinalExitSequence : MonoBehaviour
     private Text messageText;
     private Material wallMaterial;
     private Material floorMaterial;
+    private GameObject cafeteriaDoor99;
+    private BoxCollider cafeteriaDoor99Trigger;
+    private CursedRoom99Portal cafeteriaDoor99Portal;
     private bool completionVisible;
     private string completionCode;
 
@@ -31,6 +34,11 @@ public class CursedFinalExitSequence : MonoBehaviour
         if (instance != null) return;
         GameObject host = new GameObject("Cursed Final Exit Sequence");
         instance = host.AddComponent<CursedFinalExitSequence>();
+    }
+
+    private void Awake()
+    {
+        if (CursedPhaseManager.IsPhase2) EnsureCafeteriaDoor99();
     }
 
     public static bool TryStart(ExitTriggerScript exit, Collider playerCollider, GameControllerScript gc)
@@ -48,7 +56,7 @@ public class CursedFinalExitSequence : MonoBehaviour
         LockFinalExit(exit.transform);
         BuildOverlay();
 
-        messageText.text = "FINAL EXIT LOCKED\nFIND ROOM 99";
+        messageText.text = "FINAL EXIT LOCKED\nFIND CAFETERIA DOOR 99";
         yield return Fade(0f, 1f, 0.75f);
 
         HideCharacters(gc);
@@ -56,7 +64,7 @@ public class CursedFinalExitSequence : MonoBehaviour
         Vector3 mazeOrigin = new Vector3(600f, gc.player.height - 0.45f, 600f);
         Vector3 spawnPosition;
         BuildMaze(mazeOrigin, out spawnPosition);
-        InstallRoom99Portal(spawnPosition);
+        ActivateCafeteriaDoor99Portal(spawnPosition);
 
         yield return new WaitForSecondsRealtime(0.55f);
         messageText.text = "THE SCHOOL IS EMPTY";
@@ -197,66 +205,104 @@ public class CursedFinalExitSequence : MonoBehaviour
         if (fogCollider != null) fogCollider.enabled = false;
     }
 
-    private void InstallRoom99Portal(Vector3 mazeSpawn)
+    private void EnsureCafeteriaDoor99()
     {
-        Transform marker = FindRoom99Marker();
-        Transform doorway = FindNearestDoor(marker);
-        Vector3 portalPosition = doorway != null ? doorway.position + Vector3.up * 2.4f : marker.position;
+        if (cafeteriaDoor99 != null) return;
 
-        GameObject portal = new GameObject("Existing Room 99 Maze Portal", typeof(BoxCollider), typeof(CursedRoom99Portal));
-        portal.transform.position = portalPosition;
-        portal.transform.rotation = doorway != null ? doorway.rotation : marker.rotation;
-        BoxCollider trigger = portal.GetComponent<BoxCollider>();
-        trigger.isTrigger = true;
-        trigger.size = new Vector3(3.8f, 5.5f, 2.4f);
-        portal.GetComponent<CursedRoom99Portal>().mazeSpawn = mazeSpawn;
+        Transform cafeteria = FindSceneTransform("Cafeteria");
+        if (cafeteria == null)
+        {
+            Debug.LogError("Cafeteria root was not found; Door 99 cannot be installed.");
+            return;
+        }
 
-        GameObject fogBeacon = new GameObject("Room 99 White Fog Beacon", typeof(Light));
-        fogBeacon.transform.position = portalPosition + Vector3.up * 0.8f;
+        cafeteriaDoor99 = new GameObject("99");
+        cafeteriaDoor99.transform.SetParent(cafeteria, false);
+        // The cafeteria spans local X -120..0 and Z 0..80. This places the
+        // door in the middle of its north wall, facing into the cafeteria.
+        cafeteriaDoor99.transform.localPosition = new Vector3(-60f, 2.8f, 79.62f);
+        cafeteriaDoor99.transform.localRotation = Quaternion.identity;
+
+        Material doorMaterial = CreateMaterial(new Color(0.035f, 0.055f, 0.075f, 1f));
+        Material frameMaterial = CreateMaterial(new Color(0.012f, 0.012f, 0.015f, 1f));
+        Material knobMaterial = CreateMaterial(new Color(0.58f, 0.08f, 0.055f, 1f));
+        CreateLocalCube("Door 99 Surface", cafeteriaDoor99.transform, Vector3.zero,
+            new Vector3(4.4f, 5.6f, 0.28f), doorMaterial, false);
+        CreateLocalCube("Door 99 Frame Left", cafeteriaDoor99.transform, new Vector3(-2.32f, 0f, -0.03f),
+            new Vector3(0.24f, 5.9f, 0.42f), frameMaterial, false);
+        CreateLocalCube("Door 99 Frame Right", cafeteriaDoor99.transform, new Vector3(2.32f, 0f, -0.03f),
+            new Vector3(0.24f, 5.9f, 0.42f), frameMaterial, false);
+        CreateLocalCube("Door 99 Frame Top", cafeteriaDoor99.transform, new Vector3(0f, 2.92f, -0.03f),
+            new Vector3(4.88f, 0.24f, 0.42f), frameMaterial, false);
+
+        GameObject knob = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        knob.name = "Door 99 Handle";
+        knob.transform.SetParent(cafeteriaDoor99.transform, false);
+        knob.transform.localPosition = new Vector3(1.55f, -0.25f, -0.22f);
+        knob.transform.localScale = Vector3.one * 0.28f;
+        knob.GetComponent<Renderer>().material = knobMaterial;
+        Collider knobCollider = knob.GetComponent<Collider>();
+        if (knobCollider != null) knobCollider.enabled = false;
+
+        GameObject labelObject = new GameObject("Door 99 Label", typeof(TextMesh));
+        labelObject.transform.SetParent(cafeteriaDoor99.transform, false);
+        labelObject.transform.localPosition = new Vector3(0f, 1.35f, -0.18f);
+        labelObject.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+        TextMesh label = labelObject.GetComponent<TextMesh>();
+        label.text = "99";
+        label.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        label.fontSize = 96;
+        label.fontStyle = FontStyle.Bold;
+        label.characterSize = 0.085f;
+        label.anchor = TextAnchor.MiddleCenter;
+        label.alignment = TextAlignment.Center;
+        label.color = new Color(0.88f, 0.02f, 0.02f, 1f);
+        Renderer labelRenderer = labelObject.GetComponent<Renderer>();
+        if (labelRenderer != null && label.font != null) labelRenderer.sharedMaterial = label.font.material;
+
+        GameObject portalObject = new GameObject("Cafeteria Door 99 Portal", typeof(BoxCollider), typeof(CursedRoom99Portal));
+        portalObject.transform.SetParent(cafeteriaDoor99.transform, false);
+        portalObject.transform.localPosition = new Vector3(0f, 0f, -0.95f);
+        cafeteriaDoor99Trigger = portalObject.GetComponent<BoxCollider>();
+        cafeteriaDoor99Trigger.isTrigger = true;
+        cafeteriaDoor99Trigger.size = new Vector3(4.5f, 5.6f, 1.65f);
+        cafeteriaDoor99Trigger.enabled = false;
+        cafeteriaDoor99Portal = portalObject.GetComponent<CursedRoom99Portal>();
+        Debug.Log("Phase 2 cafeteria Door 99 installed on the north wall.");
+    }
+
+    private void ActivateCafeteriaDoor99Portal(Vector3 mazeSpawn)
+    {
+        EnsureCafeteriaDoor99();
+        if (cafeteriaDoor99 == null || cafeteriaDoor99Trigger == null || cafeteriaDoor99Portal == null)
+        {
+            Debug.LogError("Cafeteria Door 99 portal could not be activated.");
+            return;
+        }
+
+        cafeteriaDoor99Portal.mazeSpawn = mazeSpawn;
+        cafeteriaDoor99Trigger.enabled = true;
+
+        GameObject fogBeacon = new GameObject("Cafeteria Door 99 White Fog", typeof(Light));
+        fogBeacon.transform.SetParent(cafeteriaDoor99.transform, false);
+        fogBeacon.transform.localPosition = new Vector3(0f, 0.35f, -1.1f);
         Light light = fogBeacon.GetComponent<Light>();
         light.type = LightType.Point;
         light.range = 5.5f;
         light.intensity = 0.22f;
         light.color = new Color(0.88f, 0.92f, 1f, 1f);
+        Debug.Log("Phase 2 nightmare portal activated only on cafeteria Door 99.");
     }
 
-    private static Transform FindRoom99Marker()
+    private static Transform FindSceneTransform(string objectName)
     {
-        MeshRenderer[] renderers = Resources.FindObjectsOfTypeAll<MeshRenderer>();
-        for (int i = 0; i < renderers.Length; i++)
+        Transform[] transforms = Resources.FindObjectsOfTypeAll<Transform>();
+        for (int i = 0; i < transforms.Length; i++)
         {
-            MeshRenderer renderer = renderers[i];
-            if (!renderer.gameObject.scene.IsValid()) continue;
-            Material[] materials = renderer.sharedMaterials;
-            for (int m = 0; m < materials.Length; m++)
-            {
-                if (materials[m] != null && materials[m].name == "99") return renderer.transform;
-            }
+            if (!transforms[i].gameObject.scene.IsValid()) continue;
+            if (transforms[i].name == objectName) return transforms[i];
         }
-
-        // The open-source School scene's Room 99 marker is at this wall.
-        GameObject fallback = new GameObject("Room 99 Marker Fallback");
-        fallback.transform.position = new Vector3(-45f, 5f, 20f);
-        fallback.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
-        return fallback.transform;
-    }
-
-    private static Transform FindNearestDoor(Transform marker)
-    {
-        DoorScript[] doors = Resources.FindObjectsOfTypeAll<DoorScript>();
-        Transform nearest = null;
-        float nearestDistance = float.MaxValue;
-        for (int i = 0; i < doors.Length; i++)
-        {
-            if (!doors[i].gameObject.scene.IsValid()) continue;
-            float distance = (doors[i].transform.position - marker.position).sqrMagnitude;
-            if (distance < nearestDistance)
-            {
-                nearestDistance = distance;
-                nearest = doors[i].transform;
-            }
-        }
-        return nearest;
+        return null;
     }
 
     private static void CarveMaze(bool[,] verticalWalls, bool[,] horizontalWalls)
@@ -304,6 +350,20 @@ public class CursedFinalExitSequence : MonoBehaviour
         cube.transform.position = position;
         cube.transform.localScale = scale;
         cube.GetComponent<Renderer>().material = material;
+        return cube;
+    }
+
+    private static GameObject CreateLocalCube(string name, Transform parent, Vector3 localPosition, Vector3 localScale, Material material, bool colliderEnabled)
+    {
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.name = name;
+        cube.transform.SetParent(parent, false);
+        cube.transform.localPosition = localPosition;
+        cube.transform.localRotation = Quaternion.identity;
+        cube.transform.localScale = localScale;
+        cube.GetComponent<Renderer>().material = material;
+        Collider collider = cube.GetComponent<Collider>();
+        if (collider != null) collider.enabled = colliderEnabled;
         return cube;
     }
 
