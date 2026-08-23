@@ -119,7 +119,7 @@ public class CursedFinalExitSequence : MonoBehaviour
         RenderSettings.fogColor = new Color(0.88f, 0.9f, 0.92f, 1f);
         RenderSettings.fogDensity = 0.048f;
 
-        Light[] lights = FindObjectsOfType<Light>();
+        Light[] lights = FindObjectsByType<Light>(FindObjectsSortMode.InstanceID);
         for (int i = 0; i < lights.Length; i++) lights[i].intensity *= 0.18f;
 
         CursedFlickerLight flicker = Camera.main != null ? Camera.main.GetComponent<CursedFlickerLight>() : null;
@@ -467,7 +467,7 @@ public class CursedFinalExitSequence : MonoBehaviour
             messageText = null;
         }
 
-        if (FindObjectOfType<EventSystem>() == null)
+        if (FindFirstObjectByType<EventSystem>() == null)
         {
             new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
         }
