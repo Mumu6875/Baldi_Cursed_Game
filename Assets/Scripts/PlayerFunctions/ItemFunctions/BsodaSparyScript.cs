@@ -5,12 +5,12 @@ public class BsodaSparyScript : MonoBehaviour
 	private void Start()
 	{
 		rb = GetComponent<Rigidbody>(); //Get the RigidBody
-		rb.velocity = transform.forward * speed; //Move forward
+		rb.linearVelocity = transform.forward * speed; //Move forward
 		lifeSpan = 30f; //Set the lifespan
 	}
 	private void Update()
 	{
-		rb.velocity = transform.forward * speed; //Move forward
+		rb.linearVelocity = transform.forward * speed; //Move forward
 		lifeSpan -= Time.deltaTime; // Decrease the lifespan variable
 		if (lifeSpan < 0f) //When the lifespan timer ends, destroy the BSODA
 		{
