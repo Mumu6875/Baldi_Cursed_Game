@@ -58,16 +58,29 @@ public class PlayerScript : MonoBehaviour
 	{
 		Vector3 movement = Vector3.zero;
 		Vector3 lateralMovement = Vector3.zero;
-		if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveForward)) movement = transform.forward;
-		if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveBackward)) movement = -transform.forward;
-		if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveLeft)) lateralMovement = -transform.right;
-		if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveRight)) lateralMovement = transform.right;
+		bool mobileMovement = CursedMobileInput.IsActive;
+		float inputMagnitude;
+		if (mobileMovement)
+		{
+			Vector2 mobileInput = CursedMobileInput.GetMoveVector();
+			movement = transform.forward * mobileInput.y;
+			lateralMovement = transform.right * mobileInput.x;
+			inputMagnitude = Mathf.Clamp01(mobileInput.magnitude);
+		}
+		else
+		{
+			if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveForward)) movement = transform.forward;
+			if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveBackward)) movement = -transform.forward;
+			if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveLeft)) lateralMovement = -transform.right;
+			if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveRight)) lateralMovement = transform.right;
+			inputMagnitude = Mathf.Clamp01((movement + lateralMovement).magnitude);
+		}
 		if (stamina > 0f)
 		{
 			if (Singleton<InputManager>.Instance.GetActionKey(InputAction.Run))
 			{
 				playerSpeed = runSpeed;
-				sensitivity = 1f;
+				sensitivity = mobileMovement ? inputMagnitude : 1f;
 				if (cc.velocity.magnitude > 0.1f & !hugging & !sweeping)
 				{
 					ResetGuilt("running", 0.1f);
@@ -76,9 +89,9 @@ public class PlayerScript : MonoBehaviour
 			else
 			{
 				playerSpeed = walkSpeed;
-				if (sensitivityActive)
+				if (mobileMovement || sensitivityActive)
 				{
-					sensitivity = Mathf.Clamp((movement + lateralMovement).magnitude, 0f, 1f);
+					sensitivity = inputMagnitude;
 				}
 				else
 				{
@@ -89,9 +102,9 @@ public class PlayerScript : MonoBehaviour
 		else
 		{
 			playerSpeed = walkSpeed;
-			if (sensitivityActive)
+			if (mobileMovement || sensitivityActive)
 			{
-				sensitivity = Mathf.Clamp((lateralMovement + movement).magnitude, 0f, 1f);
+				sensitivity = inputMagnitude;
 			}
 			else
 			{
