@@ -36,12 +36,9 @@ public class PlayerMovement : MonoBehaviour
 		{
 			d = runSpeed;
 		}
-		float strafe = Input.GetAxis("Strafe");
-		float forward = Input.GetAxis("Forward");
-		if (CursedMobileInput.GetAction(InputAction.MoveLeft)) strafe -= 1f;
-		if (CursedMobileInput.GetAction(InputAction.MoveRight)) strafe += 1f;
-		if (CursedMobileInput.GetAction(InputAction.MoveBackward)) forward -= 1f;
-		if (CursedMobileInput.GetAction(InputAction.MoveForward)) forward += 1f;
+		Vector2 mobileInput = CursedMobileInput.GetMoveVector();
+		float strafe = CursedMobileInput.IsActive ? mobileInput.x : Input.GetAxis("Strafe");
+		float forward = CursedMobileInput.IsActive ? mobileInput.y : Input.GetAxis("Forward");
 		Vector3 a = transform.right * Mathf.Clamp(strafe, -1f, 1f);
 		Vector3 b = transform.forward * Mathf.Clamp(forward, -1f, 1f);
 		sensitivity = Mathf.Clamp((a + b).magnitude, 0f, 1f);
