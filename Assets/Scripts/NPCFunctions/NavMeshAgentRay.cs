@@ -7,6 +7,11 @@ public class NavMeshAgentRay : MonoBehaviour
 {
     private void OnDrawGizmos()
     {
+        if (!showPath)
+        {
+            return;
+        }
+
         if (agent == null)
         {
             agent = GetComponent<NavMeshAgent>();
@@ -23,7 +28,7 @@ public class NavMeshAgentRay : MonoBehaviour
         for (int i = 0; i < corners.Length - 1; i++)
         {
             Gizmos.DrawLine(corners[i], corners[i + 1]);
-            Gizmos.DrawSphere(corners[i], 0.1f);
+            Gizmos.DrawSphere(corners[i], Mathf.Max(pathWidth, 0f) * 0.006666667f);
         }
     }
     [Header("References")]
