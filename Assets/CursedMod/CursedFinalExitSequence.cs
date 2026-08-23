@@ -36,11 +36,6 @@ public class CursedFinalExitSequence : MonoBehaviour
         instance = host.AddComponent<CursedFinalExitSequence>();
     }
 
-    private void Awake()
-    {
-        if (CursedPhaseManager.IsPhase2) EnsureCafeteriaDoor99();
-    }
-
     public static bool TryStart(ExitTriggerScript exit, Collider playerCollider, GameControllerScript gc)
     {
         EnsureInstalled();
@@ -268,7 +263,7 @@ public class CursedFinalExitSequence : MonoBehaviour
         cafeteriaDoor99Trigger.size = new Vector3(4.5f, 5.6f, 1.65f);
         cafeteriaDoor99Trigger.enabled = false;
         cafeteriaDoor99Portal = portalObject.GetComponent<CursedRoom99Portal>();
-        Debug.Log("Phase 2 cafeteria Door 99 installed on the north wall.");
+        Debug.Log("Final exit locked: cafeteria Door 99 installed on the north wall.");
     }
 
     private void ActivateCafeteriaDoor99Portal(Vector3 mazeSpawn)

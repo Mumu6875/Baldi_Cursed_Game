@@ -225,6 +225,13 @@ projesi değiştirilmemiştir.
 - Korku alanının geometrisi harita dışındaki güvenli bölgede oluşturulmaya devam eder;
   kafeterya kapısı bu alana açılan tek giriş olarak çalışır.
 
+## 1.13.1 — Door 99 geç görünme düzeltmesi
+
+- Door 99 artık Phase 2 başlarken oluşturulmaz; başlangıçta kafeteryada görünmez
+  ve herhangi bir portal/tetikleyici çalışmaz.
+- Kapı, çerçevesi, etiketi ve portal bileşeni yalnızca son çıkış kilitlendiği anda
+  birlikte oluşturulur. Böylece oyuncu olay başlamadan Door 99'u göremez veya kullanamaz.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -242,7 +249,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.13.1 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
