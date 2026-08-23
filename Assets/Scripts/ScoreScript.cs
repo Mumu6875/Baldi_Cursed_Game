@@ -3,13 +3,12 @@ using UnityEngine;
 
 public class ScoreScript : MonoBehaviour
 {
-	private void Start()
+	private void Awake()
 	{
-		if (PlayerPrefs.GetString("CurrentMode") == "endless")
-		{
-			scoreText.SetActive(true);
-			text.text = "Score:\n" + PlayerPrefs.GetInt("CurrentBooks") + " Notebooks";
-		}
+		// Kept as a compatibility shell for scenes serialized with this component.
+		// Endless mode has been removed, so its score panel must never appear.
+		if (scoreText != null) scoreText.SetActive(false);
+		enabled = false;
 	}
 	public GameObject scoreText;
 	public TMP_Text text;
