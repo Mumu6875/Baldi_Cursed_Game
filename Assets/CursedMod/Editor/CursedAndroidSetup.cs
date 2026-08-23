@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.13.2";
+        PlayerSettings.bundleVersion = "1.13.3";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 24;
+        PlayerSettings.Android.bundleVersionCode = 25;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -103,8 +103,7 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
         {
             throw new BuildFailedException("Required Phase 1 warning image file is missing: " + WarningAssetPath);
         }
-        AssetDatabase.ImportAsset(WarningAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-        Texture2D warning = AssetDatabase.LoadAssetAtPath<Texture2D>(WarningAssetPath);
+        Texture2D warning = ImportTextureWithoutNpotScaling(WarningAssetPath);
         if (warning == null)
         {
             throw new BuildFailedException("Required Phase 1 warning image is missing: " + WarningAssetPath);
@@ -119,8 +118,7 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
         {
             throw new BuildFailedException("Required Phase 2 HELP ME exit sign is missing: " + HelpMeExitAssetPath);
         }
-        AssetDatabase.ImportAsset(HelpMeExitAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-        Texture2D helpMeExit = AssetDatabase.LoadAssetAtPath<Texture2D>(HelpMeExitAssetPath);
+        Texture2D helpMeExit = ImportTextureWithoutNpotScaling(HelpMeExitAssetPath);
         if (helpMeExit == null || helpMeExit.width != 128 || helpMeExit.height != 128)
         {
             throw new BuildFailedException("Phase 2 HELP ME exit sign must be exactly 128x128: " + HelpMeExitAssetPath);
@@ -131,11 +129,10 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
         {
             throw new BuildFailedException("Required Phase 2 completion image is missing: " + Phase2CompletionAssetPath);
         }
-        AssetDatabase.ImportAsset(Phase2CompletionAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-        Texture2D completion = AssetDatabase.LoadAssetAtPath<Texture2D>(Phase2CompletionAssetPath);
+        Texture2D completion = ImportTextureWithoutNpotScaling(Phase2CompletionAssetPath);
         if (completion == null || completion.width != 1672 || completion.height != 941)
         {
-            throw new BuildFailedException("Phase 2 completion image must be exactly 1672x941: " + Phase2CompletionAssetPath);
+            throw new BuildFailedException("Phase 2 completion image must import as 1672x941: " + Phase2CompletionAssetPath + FormatImportedSize(completion));
         }
         Debug.Log("Verified Phase 2 completion image: " + completion.width + "x" + completion.height);
 
@@ -143,11 +140,10 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
         {
             throw new BuildFailedException("Required Phase 3 password image is missing: " + Phase3PasswordAssetPath);
         }
-        AssetDatabase.ImportAsset(Phase3PasswordAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-        Texture2D phase3 = AssetDatabase.LoadAssetAtPath<Texture2D>(Phase3PasswordAssetPath);
+        Texture2D phase3 = ImportTextureWithoutNpotScaling(Phase3PasswordAssetPath);
         if (phase3 == null || phase3.width != 1672 || phase3.height != 941)
         {
-            throw new BuildFailedException("Phase 3 password image must be exactly 1672x941: " + Phase3PasswordAssetPath);
+            throw new BuildFailedException("Phase 3 password image must import as 1672x941: " + Phase3PasswordAssetPath + FormatImportedSize(phase3));
         }
         Debug.Log("Verified Phase 3 password image: " + phase3.width + "x" + phase3.height);
 
@@ -155,11 +151,10 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
         {
             throw new BuildFailedException("Required Phase 4 final image is missing: " + Phase4FinalAssetPath);
         }
-        AssetDatabase.ImportAsset(Phase4FinalAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-        Texture2D phase4 = AssetDatabase.LoadAssetAtPath<Texture2D>(Phase4FinalAssetPath);
+        Texture2D phase4 = ImportTextureWithoutNpotScaling(Phase4FinalAssetPath);
         if (phase4 == null || phase4.width != 1672 || phase4.height != 941)
         {
-            throw new BuildFailedException("Phase 4 final image must be exactly 1672x941: " + Phase4FinalAssetPath);
+            throw new BuildFailedException("Phase 4 final image must import as 1672x941: " + Phase4FinalAssetPath + FormatImportedSize(phase4));
         }
         Debug.Log("Verified Phase 4 final image: " + phase4.width + "x" + phase4.height);
 
@@ -169,8 +164,7 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
             {
                 throw new BuildFailedException("Required mobile button image is missing: " + buttonPath);
             }
-            AssetDatabase.ImportAsset(buttonPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-            Texture2D button = AssetDatabase.LoadAssetAtPath<Texture2D>(buttonPath);
+            Texture2D button = ImportTextureWithoutNpotScaling(buttonPath);
             if (button == null)
             {
                 throw new BuildFailedException("Mobile button image could not be imported: " + buttonPath);
@@ -198,6 +192,29 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
             throw new BuildFailedException("Replacement Baldi ruler sound must be a 0.5-1.0 second mono AudioClip: " + RulerAudioAssetPath);
         }
         Debug.Log("Verified replacement Baldi ruler sound: " + rulerAudio.length.ToString("F2") + " seconds, " + rulerAudio.frequency + " Hz.");
+    }
+
+    private static Texture2D ImportTextureWithoutNpotScaling(string assetPath)
+    {
+        AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+
+        TextureImporter importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+        if (importer != null && importer.npotScale != TextureImporterNPOTScale.None)
+        {
+            // The generated phase screens are 1672x941. Unity's legacy/default
+            // NPOT setting can silently resize them to 2048x1024 in Cloud Build.
+            importer.npotScale = TextureImporterNPOTScale.None;
+            importer.SaveAndReimport();
+        }
+
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+    }
+
+    private static string FormatImportedSize(Texture2D texture)
+    {
+        return texture == null
+            ? " (the TextureImporter returned null)"
+            : " (actual imported size: " + texture.width + "x" + texture.height + ")";
     }
 }
 #endif
