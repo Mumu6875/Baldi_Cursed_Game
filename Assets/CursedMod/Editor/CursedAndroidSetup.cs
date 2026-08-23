@@ -9,7 +9,7 @@ using System.IO;
 [InitializeOnLoad]
 public static class CursedAndroidSetup
 {
-    private const string SetupKey = "CursedBaldiAndroidSetup_v2";
+    private const string SetupKey = "CursedBaldiAndroidSetup_v3";
 
     static CursedAndroidSetup()
     {
@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.13.4";
+        PlayerSettings.bundleVersion = "1.13.5";
         PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 26;
+        PlayerSettings.Android.bundleVersionCode = 27;
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
