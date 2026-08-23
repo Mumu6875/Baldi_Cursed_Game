@@ -22,7 +22,7 @@ public class HuggingScript : MonoBehaviour
 	{
 		if (inBsoda)
 		{
-			rb.velocity = otherVelocity;
+			rb.linearVelocity = otherVelocity;
 		}
 	}
 	private void OnTriggerStay(Collider other)
@@ -30,7 +30,7 @@ public class HuggingScript : MonoBehaviour
 		if (other.transform.name == "1st Prize")
 		{
 			inBsoda = true;
-			otherVelocity = rb.velocity * 0.1f + other.GetComponent<NavMeshAgent>().velocity;
+			otherVelocity = rb.linearVelocity * 0.1f + other.GetComponent<NavMeshAgent>().velocity;
 			failSave = 1f;
 		}
 	}
