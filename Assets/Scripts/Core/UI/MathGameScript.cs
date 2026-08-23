@@ -60,7 +60,7 @@ public class MathGameScript : MonoBehaviour
         if (problem <= 3)
         {
             QueueAudio(bal_problems[problem - 1]);
-            if ((gc.mode == "story" & (problem <= 2 || gc.notebooks <= 1)) || (gc.mode == "endless" & (problem <= 2 || gc.notebooks != 2)))
+            if (problem <= 2 || gc.notebooks <= 1)
             {
                 num1 = (float)Mathf.RoundToInt(UnityEngine.Random.Range(0f, 9f));
                 num2 = (float)Mathf.RoundToInt(UnityEngine.Random.Range(0f, 9f));
@@ -241,12 +241,7 @@ public class MathGameScript : MonoBehaviour
             {
                 questionText.text = "WOW! YOU EXIST!";
             }
-            else if (gc.mode == "endless" & problemsWrong <= 0)
-            {
-                int num = Mathf.RoundToInt(UnityEngine.Random.Range(0f, 1f));
-                questionText.text = endlessHintText[num];
-            }
-            else if (gc.mode == "story" & problemsWrong >= 3)
+            else if (problemsWrong >= 3)
             {
                 questionText.text = "HE IS ALREADY BEHIND YOU";
                 questionText2.text = string.Empty;
@@ -311,20 +306,13 @@ public class MathGameScript : MonoBehaviour
                     baldiFeed.SetTrigger("angry");
                     gc.ActivateSpoopMode();
                 }
-                if (gc.mode == "story")
+                if (problem == 3)
                 {
-                    if (problem == 3)
-                    {
-                        baldiScript.GetAngry(1f);
-                    }
-                    else
-                    {
-                        baldiScript.GetTempAngry(0.25f);
-                    }
+                    baldiScript.GetAngry(1f);
                 }
                 else
                 {
-                    baldiScript.GetAngry(1f);
+                    baldiScript.GetTempAngry(0.25f);
                 }
                 ClearAudioQueue();
                 baldiAudio.Stop();
@@ -356,10 +344,6 @@ public class MathGameScript : MonoBehaviour
     }
     private void ExitGame()
     {
-        if (problemsWrong <= 0 & gc.mode == "endless")
-        {
-            baldiScript.GetAngry(-1f);
-        }
         gc.DeactivateLearningGame(gameObject);
     }
     public void ButtonPress(int value)
@@ -431,11 +415,6 @@ public class MathGameScript : MonoBehaviour
     {
         "THE LIGHTS WILL NOT SAVE YOU",
         "HE HEARS EVERY DOOR YOU OPEN"
-    };
-    private string[] endlessHintText = new string[]
-    {
-        "THE SCHOOL REMEMBERS YOU...",
-        "DO NOT TURN AROUND..."
     };
     private bool questionInProgress;
     private bool impossibleMode;
