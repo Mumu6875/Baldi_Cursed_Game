@@ -153,6 +153,15 @@ public class PlayerScript : MonoBehaviour
 	{
 		if (other.transform.name == "Baldi" & !gc.debugMode)
 		{
+			if (CursedPhaseManager.IsPhase2)
+			{
+				#if UNITY_EDITOR
+				UnityEditor.EditorApplication.isPlaying = false;
+				#else
+				Application.Quit();
+				#endif
+				return;
+			}
 			gameOver = true;
 			RenderSettings.skybox = blackSky; //Sets the skybox black
 			StartCoroutine(KeepTheHudOff()); //Hides the Hud
