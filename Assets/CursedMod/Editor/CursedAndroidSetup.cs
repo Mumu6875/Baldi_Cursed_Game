@@ -9,7 +9,7 @@ using System.IO;
 [InitializeOnLoad]
 public static class CursedAndroidSetup
 {
-    private const string SetupKey = "CursedBaldiAndroidSetup_v1";
+    private const string SetupKey = "CursedBaldiAndroidSetup_v2";
 
     static CursedAndroidSetup()
     {
@@ -21,12 +21,13 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.13.3";
-        PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
+        PlayerSettings.bundleVersion = "1.13.4";
+        PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 25;
+        PlayerSettings.Android.bundleVersionCode = 26;
+        PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -112,7 +113,7 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
         {
             throw new BuildFailedException("Phase 1 warning image has an invalid resolution: " + warning.width + "x" + warning.height);
         }
-        Debug.Log("Verified Phase 1 warning image: " + warning.width + "x" + warning.height);
+        Debug.Log("Verified Phase 1 notice image: " + warning.width + "x" + warning.height);
 
         if (!File.Exists(HelpMeExitAssetPath))
         {
