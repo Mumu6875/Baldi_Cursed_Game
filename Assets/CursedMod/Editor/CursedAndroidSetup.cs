@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.9.0";
+        PlayerSettings.bundleVersion = "1.10.0";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 18;
+        PlayerSettings.Android.bundleVersionCode = 19;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -86,6 +86,7 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
     private const string WarningAssetPath = "Assets/Resources/CursedMod/PiracyWarningPhase1.jpg";
     private const string RulerAudioAssetPath = "Assets/Resources/CursedMod/BaldiRulerLoud.ogg";
     private const string HelpMeExitAssetPath = "Assets/Resources/CursedMod/HelpMeExitSign.png";
+    private const string Phase2CompletionAssetPath = "Assets/Resources/CursedMod/Phase2Completion.png";
     private static readonly string[] MobileButtonAssetPaths =
     {
         "Assets/Resources/CursedMod/MobileLookBackButton.png",
@@ -123,6 +124,18 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
             throw new BuildFailedException("Phase 2 HELP ME exit sign must be exactly 128x128: " + HelpMeExitAssetPath);
         }
         Debug.Log("Verified Phase 2 HELP ME exit sign: " + helpMeExit.width + "x" + helpMeExit.height);
+
+        if (!File.Exists(Phase2CompletionAssetPath))
+        {
+            throw new BuildFailedException("Required Phase 2 completion image is missing: " + Phase2CompletionAssetPath);
+        }
+        AssetDatabase.ImportAsset(Phase2CompletionAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+        Texture2D completion = AssetDatabase.LoadAssetAtPath<Texture2D>(Phase2CompletionAssetPath);
+        if (completion == null || completion.width != 1672 || completion.height != 941)
+        {
+            throw new BuildFailedException("Phase 2 completion image must be exactly 1672x941: " + Phase2CompletionAssetPath);
+        }
+        Debug.Log("Verified Phase 2 completion image: " + completion.width + "x" + completion.height);
 
         foreach (string buttonPath in MobileButtonAssetPaths)
         {

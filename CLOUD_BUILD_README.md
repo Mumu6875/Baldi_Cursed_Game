@@ -175,6 +175,18 @@ projesi değiştirilmemiştir.
   değiştirilmez. Build doğrulaması yeni tabelanın mevcut ve tam `128x128`
   olduğunu kontrol eder.
 
+## 1.10.0 — Phase 2 rastgele kodlu bitiş ekranı
+
+- Room 99 labirent sonundaki doğrudan kapanma kaldırıldı; yalnızca Phase 2'de
+  yeni tam ekran bitiş arayüzü gösterilir.
+- Imagegen ile mevcut Cursed Baldi ve Cursed You Can Think Pad görselleri referans
+  alınarak `1672x941` yatay bitiş arka planı üretildi.
+- Oyun, Think Pad'in boş yeşil ekranına çalışma zamanında `0000–9999` aralığında
+  baştaki sıfırları koruyan rastgele dört haneli bir kod yazar.
+- Bitiş ekranı açıldığında oyun ve ses duraklatılır, mobil kontroller gizlenir;
+  ekranın herhangi bir yerine dokunulduğunda uygulama kapanır.
+- Build doğrulaması bitiş görselinin mevcut ve tam `1672x941` olduğunu kontrol eder.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -192,7 +204,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.9.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.10.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 

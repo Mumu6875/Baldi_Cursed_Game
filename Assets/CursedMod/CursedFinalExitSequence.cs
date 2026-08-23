@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -22,6 +23,7 @@ public class CursedFinalExitSequence : MonoBehaviour
     private Text messageText;
     private Material wallMaterial;
     private Material floorMaterial;
+    private bool completionVisible;
 
     public static void EnsureInstalled()
     {
@@ -368,10 +370,119 @@ public class CursedFinalExitSequence : MonoBehaviour
 
     private IEnumerator QuitRoutine()
     {
-        messageText.text = "YOU WENT TOO FAR";
-        fadeImage.color = new Color(0.94f, 0.96f, 1f, 0f);
+        messageText.text = string.Empty;
+        fadeImage.color = new Color(0f, 0f, 0f, 0f);
         yield return Fade(0f, 1f, 0.65f);
         yield return new WaitForSecondsRealtime(0.35f);
+
+        if (CursedPhaseManager.IsPhase2)
+        {
+            ShowPhase2CompletionScreen();
+            yield break;
+        }
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
+    private void ShowPhase2CompletionScreen()
+    {
+        if (completionVisible) return;
+        completionVisible = true;
+
+        Texture2D completionTexture = Resources.Load<Texture2D>("CursedMod/Phase2Completion");
+        if (completionTexture == null)
+        {
+            Debug.LogError("Phase 2 completion image could not be loaded.");
+            QuitFromCompletionScreen();
+            return;
+        }
+
+        if (overlayCanvas != null)
+        {
+            Destroy(overlayCanvas.gameObject);
+            overlayCanvas = null;
+            fadeImage = null;
+            messageText = null;
+        }
+
+        if (FindObjectOfType<EventSystem>() == null)
+        {
+            new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+        }
+
+        CursedMobileInput.Hide();
+        AudioListener.pause = true;
+        Time.timeScale = 0f;
+
+        GameObject canvasObject = new GameObject("Phase 2 Completion Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 32766;
+
+        CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1672f, 941f);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+
+        GameObject screen = new GameObject("Tap To Quit", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage), typeof(Button));
+        screen.transform.SetParent(canvasObject.transform, false);
+        RectTransform screenRect = screen.GetComponent<RectTransform>();
+        screenRect.anchorMin = Vector2.zero;
+        screenRect.anchorMax = Vector2.one;
+        screenRect.offsetMin = Vector2.zero;
+        screenRect.offsetMax = Vector2.zero;
+
+        RawImage background = screen.GetComponent<RawImage>();
+        background.texture = completionTexture;
+        background.color = Color.white;
+        background.raycastTarget = true;
+
+        Button quitButton = screen.GetComponent<Button>();
+        quitButton.transition = Selectable.Transition.None;
+        quitButton.targetGraphic = background;
+        quitButton.onClick.AddListener(QuitFromCompletionScreen);
+
+        GameObject codeObject = new GameObject("Random Four Digit Code", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text), typeof(Outline));
+        codeObject.transform.SetParent(screen.transform, false);
+        RectTransform codeRect = codeObject.GetComponent<RectTransform>();
+        // Matches the empty green display in the generated 1672x941 background.
+        codeRect.anchorMin = new Vector2(0.50f, 0.395f);
+        codeRect.anchorMax = new Vector2(0.812f, 0.751f);
+        codeRect.offsetMin = Vector2.zero;
+        codeRect.offsetMax = Vector2.zero;
+
+        Text codeText = codeObject.GetComponent<Text>();
+        codeText.text = GenerateFourDigitCode();
+        codeText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        codeText.fontSize = 132;
+        codeText.fontStyle = FontStyle.Bold;
+        codeText.alignment = TextAnchor.MiddleCenter;
+        codeText.color = new Color(0.055f, 0.012f, 0.012f, 1f);
+        codeText.resizeTextForBestFit = true;
+        codeText.resizeTextMinSize = 72;
+        codeText.resizeTextMaxSize = 140;
+        codeText.raycastTarget = false;
+
+        Outline outline = codeObject.GetComponent<Outline>();
+        outline.effectColor = new Color(0.48f, 0f, 0f, 0.92f);
+        outline.effectDistance = new Vector2(3f, -3f);
+        Debug.Log("Phase 2 completion code: " + codeText.text);
+    }
+
+    private static string GenerateFourDigitCode()
+    {
+        return UnityEngine.Random.Range(0, 10000).ToString("D4");
+    }
+
+    private void QuitFromCompletionScreen()
+    {
+        if (!completionVisible) return;
+        completionVisible = false;
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
