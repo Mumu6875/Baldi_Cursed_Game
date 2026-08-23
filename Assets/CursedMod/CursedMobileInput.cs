@@ -39,14 +39,19 @@ public class CursedMobileInput : MonoBehaviour
 
         switch (action)
         {
-            case InputAction.MoveForward: return moveVector.y > 0.22f;
-            case InputAction.MoveBackward: return moveVector.y < -0.22f;
-            case InputAction.MoveLeft: return moveVector.x < -0.22f;
-            case InputAction.MoveRight: return moveVector.x > 0.22f;
+            case InputAction.MoveForward: return moveVector.y > 0.075f;
+            case InputAction.MoveBackward: return moveVector.y < -0.075f;
+            case InputAction.MoveLeft: return moveVector.x < -0.075f;
+            case InputAction.MoveRight: return moveVector.x > 0.075f;
             case InputAction.PauseOrCancel:
                 return actionStates[(int)action] || Time.unscaledTime < pausePulseUntil;
             default: return actionStates[(int)action];
         }
+    }
+
+    public static Vector2 GetMoveVector()
+    {
+        return IsActive ? Vector2.ClampMagnitude(moveVector, 1f) : Vector2.zero;
     }
 
     public static float ConsumeLookDeltaX()
@@ -235,8 +240,8 @@ public class CursedMobileInput : MonoBehaviour
         baseOutline.effectColor = new Color(0.9f, 0.08f, 0.08f, 0.72f);
         baseOutline.effectDistance = new Vector2(4f, -4f);
         CursedJoystick joystick = joystickBase.AddComponent<CursedJoystick>();
-        joystick.radius = 100f;
-        joystick.deadZone = 0.12f;
+        joystick.radius = 112f;
+        joystick.deadZone = 0.055f;
 
         GameObject knob = MakePanel("Knob", joystickBase.transform, new Color(0.68f, 0.04f, 0.04f, 0.78f));
         RectTransform knobRect = knob.GetComponent<RectTransform>();
@@ -364,23 +369,30 @@ public class CursedMobileInput : MonoBehaviour
         rect.anchoredPosition = position;
     }
 
-    private class CursedJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+    private class CursedJoystick : MonoBehaviour, IInitializePotentialDragHandler, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         public RectTransform knob;
         public float radius;
         public float deadZone;
         private int activePointerId = int.MinValue;
 
+        public void OnInitializePotentialDrag(PointerEventData eventData)
+        {
+            // Do not wait for EventSystem's pixel drag threshold. Directional
+            // movement must react on the first tiny finger movement.
+            eventData.useDragThreshold = false;
+        }
+
         public void OnPointerDown(PointerEventData eventData)
         {
             if (activePointerId != int.MinValue) return;
             activePointerId = eventData.pointerId;
-            UpdatePosition(eventData);
+            UpdatePosition(eventData.position, eventData.pressEventCamera);
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (eventData.pointerId == activePointerId) UpdatePosition(eventData);
+            if (eventData.pointerId == activePointerId) UpdatePosition(eventData.position, eventData.pressEventCamera);
         }
 
         public void OnPointerUp(PointerEventData eventData)
@@ -396,16 +408,65 @@ public class CursedMobileInput : MonoBehaviour
             ResetJoystick();
         }
 
+        private void Update()
+        {
+            if (!CursedMobileInput.IsActive)
+            {
+                if (activePointerId >= 0) ResetPointer();
+                return;
+            }
+
+            bool trackedTouchFound = false;
+            RectTransform touchArea = (RectTransform)transform;
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                Touch touch = Input.GetTouch(i);
+                if (activePointerId == int.MinValue && touch.phase == TouchPhase.Began &&
+                    RectTransformUtility.RectangleContainsScreenPoint(touchArea, touch.position, null))
+                {
+                    activePointerId = touch.fingerId;
+                }
+
+                if (touch.fingerId != activePointerId) continue;
+                trackedTouchFound = true;
+
+                if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+                {
+                    ResetPointer();
+                }
+                else
+                {
+                    // Raw Android fallback: keeps tracking the captured finger
+                    // even if StandaloneInputModule drops an OnDrag callback.
+                    UpdatePosition(touch.position, null);
+                }
+            }
+
+            if (activePointerId >= 0 && !trackedTouchFound)
+            {
+                ResetPointer();
+            }
+        }
+
         private void ResetJoystick()
         {
             moveVector = Vector2.zero;
             if (knob != null) knob.anchoredPosition = Vector2.zero;
         }
 
-        private void UpdatePosition(PointerEventData eventData)
+        private void ResetPointer()
+        {
+            activePointerId = int.MinValue;
+            ResetJoystick();
+        }
+
+        private void UpdatePosition(Vector2 screenPosition, Camera eventCamera)
         {
             Vector2 local;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)transform, eventData.position, eventData.pressEventCamera, out local);
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)transform, screenPosition, eventCamera, out local))
+            {
+                return;
+            }
             local = Vector2.ClampMagnitude(local, radius);
             float normalizedMagnitude = local.magnitude / Mathf.Max(radius, 1f);
             if (normalizedMagnitude <= deadZone)
