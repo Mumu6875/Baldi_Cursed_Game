@@ -65,6 +65,14 @@ public class CursedHorrorBootstrap : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if (CursedPhaseManager.IsPhase4)
+        {
+            horrorActive = false;
+            RemoveDangerOverlay();
+            CursedPhase4Screen.Show();
+            return;
+        }
+
         if (CursedPhaseManager.IsPhase3)
         {
             horrorActive = false;

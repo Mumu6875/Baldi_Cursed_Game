@@ -42,7 +42,7 @@ public sealed class CursedPhase3Screen : MonoBehaviour
         remainingTime -= Time.unscaledDeltaTime;
         if (remainingTime <= 0f)
         {
-            Quit("Phase 3 timeout after 66.6 seconds.");
+            FailAndQuit("Phase 3 timeout after 66.6 seconds.");
         }
     }
 
@@ -52,7 +52,7 @@ public sealed class CursedPhase3Screen : MonoBehaviour
         if (backgroundTexture == null)
         {
             Debug.LogError("Phase 3 password image could not be loaded.");
-            Quit("Missing Phase 3 password image.");
+            FailAndQuit("Missing Phase 3 password image.");
             return;
         }
 
@@ -190,7 +190,20 @@ public sealed class CursedPhase3Screen : MonoBehaviour
     private void SubmitPassword()
     {
         bool correct = enteredPassword == CursedPhaseManager.Phase3Password;
-        Quit(correct ? "Correct Phase 3 password." : "Wrong Phase 3 password.");
+        if (correct)
+        {
+            CursedPhaseManager.UnlockPhase4();
+            Quit("Correct Phase 3 password. Phase 4 unlocked.");
+            return;
+        }
+
+        FailAndQuit("Wrong Phase 3 password. Progress reset to Phase 1.");
+    }
+
+    private void FailAndQuit(string reason)
+    {
+        CursedPhaseManager.ResetToPhase1();
+        Quit(reason);
     }
 
     private static void StopEverySound()

@@ -21,12 +21,12 @@ public static class CursedAndroidSetup
     {
         PlayerSettings.companyName = "Cursed Classroom Mods";
         PlayerSettings.productName = "Baldi Cursed Classroom";
-        PlayerSettings.bundleVersion = "1.11.0";
+        PlayerSettings.bundleVersion = "1.12.0";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cursedclassroom.baldihorror");
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
-        PlayerSettings.Android.bundleVersionCode = 20;
+        PlayerSettings.Android.bundleVersionCode = 21;
         PlayerSettings.MTRendering = true;
         PlayerSettings.runInBackground = false;
         QualitySettings.vSyncCount = 0;
@@ -88,6 +88,7 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
     private const string HelpMeExitAssetPath = "Assets/Resources/CursedMod/HelpMeExitSign.png";
     private const string Phase2CompletionAssetPath = "Assets/Resources/CursedMod/Phase2Completion.png";
     private const string Phase3PasswordAssetPath = "Assets/Resources/CursedMod/Phase3Password.png";
+    private const string Phase4FinalAssetPath = "Assets/Resources/CursedMod/Phase4Final.png";
     private static readonly string[] MobileButtonAssetPaths =
     {
         "Assets/Resources/CursedMod/MobileLookBackButton.png",
@@ -149,6 +150,18 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
             throw new BuildFailedException("Phase 3 password image must be exactly 1672x941: " + Phase3PasswordAssetPath);
         }
         Debug.Log("Verified Phase 3 password image: " + phase3.width + "x" + phase3.height);
+
+        if (!File.Exists(Phase4FinalAssetPath))
+        {
+            throw new BuildFailedException("Required Phase 4 final image is missing: " + Phase4FinalAssetPath);
+        }
+        AssetDatabase.ImportAsset(Phase4FinalAssetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+        Texture2D phase4 = AssetDatabase.LoadAssetAtPath<Texture2D>(Phase4FinalAssetPath);
+        if (phase4 == null || phase4.width != 1672 || phase4.height != 941)
+        {
+            throw new BuildFailedException("Phase 4 final image must be exactly 1672x941: " + Phase4FinalAssetPath);
+        }
+        Debug.Log("Verified Phase 4 final image: " + phase4.width + "x" + phase4.height);
 
         foreach (string buttonPath in MobileButtonAssetPaths)
         {

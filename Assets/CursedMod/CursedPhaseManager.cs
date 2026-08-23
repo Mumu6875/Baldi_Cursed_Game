@@ -3,8 +3,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// Persists the three-stage horror flow between Android launches.
-/// Phase 1 unlocks Phase 2; finishing Phase 2 stores the password and unlocks Phase 3.
+/// Persists the four-stage horror flow between Android launches.
+/// Phase 3 unlocks Phase 4 only when its saved password is entered correctly.
 /// </summary>
 public static class CursedPhaseManager
 {
@@ -13,6 +13,7 @@ public static class CursedPhaseManager
     private const string Phase2Key = "CursedHorrorPhase2Unlocked_v2";
     private const string Phase3Key = "CursedHorrorPhase3Unlocked_v1";
     private const string Phase3PasswordKey = "CursedHorrorPhase3Password_v1";
+    private const string Phase4Key = "CursedHorrorPhase4Unlocked_v1";
     private static bool warningVisible;
 
     public static bool IsPhase2
@@ -30,6 +31,11 @@ public static class CursedPhaseManager
         get { return PlayerPrefs.GetString(Phase3PasswordKey, "0000"); }
     }
 
+    public static bool IsPhase4
+    {
+        get { return PlayerPrefs.GetInt(Phase4Key, 0) == 1; }
+    }
+
     public static void UnlockPhase3(string password)
     {
         if (string.IsNullOrEmpty(password) || password.Length != 4)
@@ -39,6 +45,25 @@ public static class CursedPhaseManager
         }
         PlayerPrefs.SetString(Phase3PasswordKey, password);
         PlayerPrefs.SetInt(Phase3Key, 1);
+        PlayerPrefs.Save();
+    }
+
+    public static void UnlockPhase4()
+    {
+        PlayerPrefs.SetInt(Phase4Key, 1);
+        PlayerPrefs.DeleteKey(Phase2Key);
+        PlayerPrefs.DeleteKey(Phase3Key);
+        PlayerPrefs.DeleteKey(Phase3PasswordKey);
+        PlayerPrefs.Save();
+    }
+
+    public static void ResetToPhase1()
+    {
+        warningVisible = false;
+        PlayerPrefs.DeleteKey(Phase2Key);
+        PlayerPrefs.DeleteKey(Phase3Key);
+        PlayerPrefs.DeleteKey(Phase3PasswordKey);
+        PlayerPrefs.DeleteKey(Phase4Key);
         PlayerPrefs.Save();
     }
 

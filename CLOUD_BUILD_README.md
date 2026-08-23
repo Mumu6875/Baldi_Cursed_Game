@@ -201,6 +201,19 @@ projesi değiştirilmemiştir.
   Hiçbir işlem yapılmazsa ekran, ölçeklenmemiş zamanla tam `66,6` saniye sonra kapanır.
 - Build doğrulaması Phase 3 görselinin mevcut ve tam `1672x941` olduğunu kontrol eder.
 
+## 1.12.0 — Phase 4 final ekranı ve Phase 3 sonuçları
+
+- Phase 3'te kaydedilen dört haneli parola doğru girilirse Phase 4 kalıcı olarak
+  açılır ve uygulama kapanır. Sonraki açılışta yalnızca Phase 4 ekranı gösterilir.
+- Yanlış parola veya `66,6` saniyelik zaman aşımı Phase 4'ü açmaz; Phase 2,
+  Phase 3 ve parola kayıtları silinir. Sonraki açılış Phase 1'den başlar.
+- Imagegen ile yüklenen karakterin üst merkezde bulunduğu `1672x941` karanlık
+  Phase 4 arka planı üretildi. Unity, tam ortada kırmızı renkle birebir
+  `You were just a mistake.` metnini çalışma zamanında çizer.
+- Phase 4 ekranının tamamı tek dokunmatik kapatma alanıdır. Ekrana dokunulduğunda
+  uygulama kapanır; ana menü veya normal oyun arayüzü gösterilmez.
+- Build doğrulaması Phase 4 görselinin mevcut ve tam `1672x941` olduğunu kontrol eder.
+
 ## Önemli dönüşüm notu
 
 Bu paket Unity 6.3 LTS geçiş adayıdır. Eski Analytics, Package Manager UI,
@@ -218,7 +231,7 @@ hata düzeltilip yeni bir geçiş turu yapılmalıdır.
   grafik arayüzlü TMP kaynak içe aktarma penceresi artık açılmaz.
 - Unity 6'da nondeterministic import hatası oluşturan eski TMP sprite
   kaynakları kaldırıldı.
-- Android minimum API seviyesi 26 ve uygulama sürümü 1.11.0 olarak sabitlendi.
+- Android minimum API seviyesi 26 ve uygulama sürümü 1.12.0 olarak sabitlendi.
 
 ## Lisans / dağıtım
 
