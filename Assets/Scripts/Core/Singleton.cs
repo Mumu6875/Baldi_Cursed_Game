@@ -1,5 +1,23 @@
 using UnityEngine;
 
+internal static class SingletonRuntimeState
+{
+    internal static bool IsApplicationQuitting { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void Initialize()
+    {
+        IsApplicationQuitting = false;
+        Application.quitting -= MarkApplicationQuitting;
+        Application.quitting += MarkApplicationQuitting;
+    }
+
+    private static void MarkApplicationQuitting()
+    {
+        IsApplicationQuitting = true;
+    }
+}
+
 public class Singleton<T> : MonoBehaviour where T : Component
 {
     public static T Instance
@@ -13,7 +31,7 @@ public class Singleton<T> : MonoBehaviour where T : Component
 
             if (instance == null)
             {
-                instance = FindObjectOfType<T>();
+                instance = FindFirstObjectByType<T>();
                 if (instance == null && Application.isPlaying)
                 {
                     instance = CreateInstance();
@@ -23,13 +41,8 @@ public class Singleton<T> : MonoBehaviour where T : Component
         }
     }
 
-    [RuntimeInitializeOnLoadMethod]
-    private static void Init() => Application.quitting += () => isApplicationQuitting = true;
-
     protected virtual void Awake()
     {
-        isApplicationQuitting = false;
-
         if (instance != null && instance != this)
         {
             Destroy(gameObject);
@@ -68,6 +81,6 @@ public class Singleton<T> : MonoBehaviour where T : Component
     }
 
     private static T instance;
-    public static bool isApplicationQuitting;
+    public static bool isApplicationQuitting => SingletonRuntimeState.IsApplicationQuitting;
     public static bool Exist => instance != null;
 }
