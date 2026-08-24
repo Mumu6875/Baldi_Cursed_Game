@@ -368,6 +368,26 @@ public static class CursedThinkPadInstaller
         {
             RawImage stockBackground = stockThinkPad.GetComponent<RawImage>();
             if (stockBackground != null) stockBackground.enabled = false;
+
+            // Keep the original Button components and callbacks, but align their
+            // invisible hit areas with the keys baked into the cursed artwork.
+            ConfigureKey(stockThinkPad, "Button (7)", new Vector2(224.6f, 203.3f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (8)", new Vector2(281.5f, 202.0f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (9)", new Vector2(336.4f, 202.6f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (4)", new Vector2(224.9f, 133.0f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (5)", new Vector2(281.2f, 132.3f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (6)", new Vector2(337.1f, 132.8f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (1)", new Vector2(225.5f, 62.8f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (2)", new Vector2(281.9f, 62.9f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (3)", new Vector2(336.4f, 62.5f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (0)", new Vector2(253.4f, -7.4f), new Vector2(106f, 64f));
+            ConfigureKey(stockThinkPad, "Button (-)", new Vector2(337.0f, -7.9f), new Vector2(53f, 64f));
+            ConfigureKey(stockThinkPad, "Button (OK)", new Vector2(276.4f, -149.8f), new Vector2(142f, 164f));
+
+            // The cursed artwork has a wide zero key instead of a clear key.
+            // Disable the old clear button so the left half of zero cannot erase.
+            Transform clearKey = stockThinkPad.Find("Buttons/Button (C)");
+            if (clearKey != null) clearKey.gameObject.SetActive(false);
         }
 
         GameObject skin = new GameObject("Cursed Think Pad Skin", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
@@ -393,6 +413,33 @@ public static class CursedThinkPadInstaller
         image.texture = texture;
         image.color = new Color(0.82f, 0.82f, 0.82f, 1f);
         image.raycastTarget = false;
+    }
+
+    private static void ConfigureKey(Transform stockThinkPad, string keyName, Vector2 position, Vector2 size)
+    {
+        Transform key = stockThinkPad.Find("Buttons/" + keyName);
+        if (key == null) return;
+
+        RectTransform rect = key as RectTransform;
+        if (rect != null)
+        {
+            rect.anchoredPosition = position;
+            rect.sizeDelta = size;
+        }
+
+        Button button = key.GetComponent<Button>();
+        if (button != null) button.transition = Selectable.Transition.None;
+
+        // The generated skin already draws the keys. Preserve transparent
+        // raycast graphics for input without drawing the stock keys twice.
+        Graphic[] graphics = key.GetComponentsInChildren<Graphic>(true);
+        for (int i = 0; i < graphics.Length; i++)
+        {
+            Color color = graphics[i].color;
+            color.a = 0f;
+            graphics[i].color = color;
+            graphics[i].raycastTarget = true;
+        }
     }
 }
 
