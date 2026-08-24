@@ -368,26 +368,8 @@ public static class CursedThinkPadInstaller
         {
             RawImage stockBackground = stockThinkPad.GetComponent<RawImage>();
             if (stockBackground != null) stockBackground.enabled = false;
-
-            // Keep the original Button components and callbacks, but align their
-            // invisible hit areas with the keys baked into the cursed artwork.
-            ConfigureKey(stockThinkPad, "Button (7)", new Vector2(224.6f, 203.3f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (8)", new Vector2(281.5f, 202.0f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (9)", new Vector2(336.4f, 202.6f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (4)", new Vector2(224.9f, 133.0f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (5)", new Vector2(281.2f, 132.3f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (6)", new Vector2(337.1f, 132.8f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (1)", new Vector2(225.5f, 62.8f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (2)", new Vector2(281.9f, 62.9f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (3)", new Vector2(336.4f, 62.5f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (0)", new Vector2(253.4f, -7.4f), new Vector2(106f, 64f));
-            ConfigureKey(stockThinkPad, "Button (-)", new Vector2(337.0f, -7.9f), new Vector2(53f, 64f));
-            ConfigureKey(stockThinkPad, "Button (OK)", new Vector2(276.4f, -149.8f), new Vector2(142f, 164f));
-
-            // The cursed artwork has a wide zero key instead of a clear key.
-            // Disable the old clear button so the left half of zero cannot erase.
-            Transform clearKey = stockThinkPad.Find("Buttons/Button (C)");
-            if (clearKey != null) clearKey.gameObject.SetActive(false);
+            Transform stockButtons = stockThinkPad.Find("Buttons");
+            if (stockButtons != null) stockButtons.gameObject.SetActive(false);
         }
 
         GameObject skin = new GameObject("Cursed Think Pad Skin", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
@@ -413,32 +395,56 @@ public static class CursedThinkPadInstaller
         image.texture = texture;
         image.color = new Color(0.82f, 0.82f, 0.82f, 1f);
         image.raycastTarget = false;
+
+        // Build fresh hit regions from the exact normalized pixel bounds in the
+        // 1536x1024 cursed artwork. These scale together with the skin on every
+        // aspect ratio and bypass the differently spaced stock keypad entirely.
+        GameObject controls = new GameObject("Cursed Think Pad Controls", typeof(RectTransform));
+        controls.transform.SetParent(root.transform, false);
+        RectTransform controlsRect = controls.GetComponent<RectTransform>();
+        controlsRect.anchorMin = Vector2.zero;
+        controlsRect.anchorMax = Vector2.one;
+        controlsRect.offsetMin = Vector2.zero;
+        controlsRect.offsetMax = Vector2.zero;
+        controls.transform.SetAsLastSibling();
+
+        CreateKey(controls.transform, "7", new Vector2(0.7507f, 0.7861f), new Vector2(0.8125f, 0.8896f), math, 7, false);
+        CreateKey(controls.transform, "8", new Vector2(0.8223f, 0.7852f), new Vector2(0.8841f, 0.8877f), math, 8, false);
+        CreateKey(controls.transform, "9", new Vector2(0.8913f, 0.7871f), new Vector2(0.9518f, 0.8867f), math, 9, false);
+        CreateKey(controls.transform, "4", new Vector2(0.7500f, 0.6689f), new Vector2(0.8125f, 0.7725f), math, 4, false);
+        CreateKey(controls.transform, "5", new Vector2(0.8216f, 0.6699f), new Vector2(0.8828f, 0.7705f), math, 5, false);
+        CreateKey(controls.transform, "6", new Vector2(0.8919f, 0.6709f), new Vector2(0.9518f, 0.7705f), math, 6, false);
+        CreateKey(controls.transform, "1", new Vector2(0.7520f, 0.5537f), new Vector2(0.8118f, 0.6543f), math, 1, false);
+        CreateKey(controls.transform, "2", new Vector2(0.8216f, 0.5537f), new Vector2(0.8835f, 0.6543f), math, 2, false);
+        CreateKey(controls.transform, "3", new Vector2(0.8906f, 0.5527f), new Vector2(0.9518f, 0.6543f), math, 3, false);
+        CreateKey(controls.transform, "0", new Vector2(0.7513f, 0.4346f), new Vector2(0.8828f, 0.5400f), math, 0, false);
+        CreateKey(controls.transform, "Minus", new Vector2(0.8919f, 0.4307f), new Vector2(0.9518f, 0.5381f), math, -1, false);
+        CreateKey(controls.transform, "OK", new Vector2(0.7565f, 0.1152f), new Vector2(0.9303f, 0.3838f), math, 0, true);
     }
 
-    private static void ConfigureKey(Transform stockThinkPad, string keyName, Vector2 position, Vector2 size)
+    private static void CreateKey(Transform parent, string keyName, Vector2 anchorMin, Vector2 anchorMax, MathGameScript math, int value, bool submit)
     {
-        Transform key = stockThinkPad.Find("Buttons/" + keyName);
-        if (key == null) return;
+        GameObject key = new GameObject("Cursed Key " + keyName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+        key.transform.SetParent(parent, false);
+        RectTransform rect = key.GetComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
 
-        RectTransform rect = key as RectTransform;
-        if (rect != null)
-        {
-            rect.anchoredPosition = position;
-            rect.sizeDelta = size;
-        }
+        Image hitArea = key.GetComponent<Image>();
+        hitArea.color = new Color(1f, 1f, 1f, 0f);
+        hitArea.raycastTarget = true;
 
         Button button = key.GetComponent<Button>();
-        if (button != null) button.transition = Selectable.Transition.None;
-
-        // The generated skin already draws the keys. Preserve transparent
-        // raycast graphics for input without drawing the stock keys twice.
-        Graphic[] graphics = key.GetComponentsInChildren<Graphic>(true);
-        for (int i = 0; i < graphics.Length; i++)
+        button.transition = Selectable.Transition.None;
+        if (submit)
         {
-            Color color = graphics[i].color;
-            color.a = 0f;
-            graphics[i].color = color;
-            graphics[i].raycastTarget = true;
+            button.onClick.AddListener(delegate { math.OKButton(); });
+        }
+        else
+        {
+            button.onClick.AddListener(delegate { math.ButtonPress(value); });
         }
     }
 }
