@@ -46,7 +46,9 @@ public class GameControllerScript : MonoBehaviour
 				Time.timeScale = 1f;
 			}
 
-			if (Singleton<InputManager>.Instance.GetActionKeyDown(InputAction.UseItem) && Time.timeScale != 0f)
+			// Items can only be activated by the dedicated round mobile item button.
+			// Mouse clicks, screen-look touches and other action buttons cannot fire it.
+			if (CursedMobileInput.ConsumeItemUsePress() && Time.timeScale != 0f)
 			{
 				UseItem();
 			}
@@ -62,7 +64,13 @@ public class GameControllerScript : MonoBehaviour
 
 			if (Time.timeScale != 0f)
 			{
-				if (Singleton<InputManager>.Instance.GetActionKey(InputAction.Slot0))
+				int mobileSlot = CursedMobileInput.ConsumeSlotSelection();
+				if (mobileSlot >= 0 && mobileSlot <= 2)
+				{
+					itemSelected = mobileSlot;
+					UpdateItemSelection();
+				}
+				else if (Singleton<InputManager>.Instance.GetActionKey(InputAction.Slot0))
 				{
 					itemSelected = 0;
 					UpdateItemSelection();

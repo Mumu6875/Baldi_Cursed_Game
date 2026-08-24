@@ -14,6 +14,8 @@ public class CursedMobileInput : MonoBehaviour
     private static Vector2 moveVector;
     private static float lookDeltaX;
     private static float pausePulseUntil;
+    private static bool itemUseQueued;
+    private static int slotSelectionQueued = -1;
 
     private Canvas canvas;
     private bool sceneWantsVisible;
@@ -74,6 +76,20 @@ public class CursedMobileInput : MonoBehaviour
         }
     }
 
+    public static bool ConsumeItemUsePress()
+    {
+        bool pressed = itemUseQueued;
+        itemUseQueued = false;
+        return pressed;
+    }
+
+    public static int ConsumeSlotSelection()
+    {
+        int slot = slotSelectionQueued;
+        slotSelectionQueued = -1;
+        return slot;
+    }
+
     public static void EnsureForGameplayScene()
     {
         if (instance != null)
@@ -105,6 +121,8 @@ public class CursedMobileInput : MonoBehaviour
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
             pausePulseUntil = 0f;
+            itemUseQueued = false;
+            slotSelectionQueued = -1;
             for (int i = 0; i < actionStates.Length; i++) actionStates[i] = false;
         }
     }
@@ -117,6 +135,8 @@ public class CursedMobileInput : MonoBehaviour
         {
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
+            itemUseQueued = false;
+            slotSelectionQueued = -1;
             ResetLookTouch();
             for (int i = 0; i < actionStates.Length; i++) actionStates[i] = false;
         }
@@ -256,9 +276,15 @@ public class CursedMobileInput : MonoBehaviour
         MakeTextureActionButton("LookBackIcon", "CursedMod/MobileLookBackButton", InputAction.LookBehind, new Vector2(-135f, 335f), new Vector2(0.88f, 0f));
         MakeTextureActionButton("RunIcon", "CursedMod/MobileRunButton", InputAction.Run, new Vector2(-135f, 165f), new Vector2(0.88f, 0f));
         MakeActionButton("GRAB", InputAction.Interact, new Vector2(-430f, 185f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
-        MakeActionButton("USE", InputAction.UseItem, new Vector2(-430f, 330f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
+        MakeTextureItemButton("ItemIcon", "CursedMod/MobileUseItemButton", new Vector2(-430f, 330f), new Vector2(0.88f, 0f));
         // Top-center placement avoids covering the third inventory slot.
         MakeActionButton("II", InputAction.PauseOrCancel, new Vector2(0f, -68f), new Vector2(0.5f, 1f), new Vector2(104f, 88f), new Color(0.12f, 0f, 0f, 0.72f));
+
+        // Transparent tap targets follow the three stock inventory slots.
+        // Selecting a slot never uses its item.
+        MakeSlotSelectButton(0, new Vector2(-166f, -47f));
+        MakeSlotSelectButton(1, new Vector2(-97f, -47f));
+        MakeSlotSelectButton(2, new Vector2(-29f, -47f));
     }
 
     private void MakeActionButton(string label, InputAction action, Vector2 position, Vector2 anchor, Vector2 size, Color color)
@@ -317,6 +343,58 @@ public class CursedMobileInput : MonoBehaviour
 
         CursedMobileHoldButton button = buttonObject.AddComponent<CursedMobileHoldButton>();
         button.action = action;
+    }
+
+    private void MakeTextureItemButton(string objectName, string resourcePath, Vector2 position, Vector2 anchor)
+    {
+        Texture2D texture = Resources.Load<Texture2D>(resourcePath);
+        if (texture == null)
+        {
+            Debug.LogError("Item button texture could not be loaded: " + resourcePath);
+            return;
+        }
+
+        GameObject buttonObject = MakePanel(objectName, transform, Color.clear);
+        RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
+        SetRect(buttonRect, anchor, anchor, new Vector2(150f, 150f), position);
+        lookBlockedRects.Add(buttonRect);
+
+        GameObject iconObject = new GameObject("Icon", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+        iconObject.transform.SetParent(buttonObject.transform, false);
+        RectTransform iconRect = iconObject.GetComponent<RectTransform>();
+        SetRect(iconRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        RawImage image = iconObject.GetComponent<RawImage>();
+        image.texture = texture;
+        image.color = Color.white;
+        image.raycastTarget = false;
+
+        Button button = buttonObject.AddComponent<Button>();
+        button.targetGraphic = buttonObject.GetComponent<Image>();
+        button.transition = Selectable.Transition.None;
+        button.onClick.AddListener(QueueItemUse);
+    }
+
+    private void MakeSlotSelectButton(int slot, Vector2 position)
+    {
+        GameObject buttonObject = MakePanel("Select Item Slot " + (slot + 1), transform, Color.clear);
+        RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
+        SetRect(buttonRect, Vector2.one, Vector2.one, new Vector2(68f, 80f), position);
+
+        Button button = buttonObject.AddComponent<Button>();
+        button.targetGraphic = buttonObject.GetComponent<Image>();
+        button.transition = Selectable.Transition.None;
+        int capturedSlot = slot;
+        button.onClick.AddListener(delegate { QueueSlotSelection(capturedSlot); });
+    }
+
+    private void QueueItemUse()
+    {
+        itemUseQueued = true;
+    }
+
+    private void QueueSlotSelection(int slot)
+    {
+        slotSelectionQueued = Mathf.Clamp(slot, 0, 2);
     }
 
     private static void ConfigureCircularImage(Image image, Color color)
