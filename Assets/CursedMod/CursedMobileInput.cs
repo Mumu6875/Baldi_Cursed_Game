@@ -23,6 +23,9 @@ public class CursedMobileInput : MonoBehaviour
     private int lookFingerId = -1;
     private Vector2 previousLookPosition;
     private readonly List<RectTransform> lookBlockedRects = new List<RectTransform>();
+    private readonly RectTransform[] slotTouchRects = new RectTransform[3];
+    private readonly RectTransform[] trackedSlotRects = new RectTransform[3];
+    private readonly Vector3[] slotWorldCorners = new Vector3[4];
 
     private const float LookSensitivity = 0.12f;
     private const float MaxLookPerFrame = 6.5f;
@@ -98,6 +101,7 @@ public class CursedMobileInput : MonoBehaviour
         if (instance != null)
         {
             instance.SetVisible(true);
+            instance.BindInventorySlots();
             return;
         }
 
@@ -105,6 +109,7 @@ public class CursedMobileInput : MonoBehaviour
         instance = root.AddComponent<CursedMobileInput>();
         DontDestroyOnLoad(root);
         instance.BuildUI();
+        instance.BindInventorySlots();
     }
 
     public static void Hide()
@@ -154,6 +159,7 @@ public class CursedMobileInput : MonoBehaviour
         // suspend raw camera-touch tracking while the math keypad is open.
         bool thinkPadIsOpen = FindFirstObjectByType<MathGameScript>() != null;
         canvas.enabled = sceneWantsVisible && !thinkPadIsOpen;
+        UpdateInventorySlotTargets();
         if (thinkPadIsOpen)
         {
             moveVector = Vector2.zero;
@@ -325,11 +331,10 @@ public class CursedMobileInput : MonoBehaviour
         // Top-center placement avoids covering the third inventory slot.
         MakeActionButton("II", InputAction.PauseOrCancel, new Vector2(0f, -68f), new Vector2(0.5f, 1f), new Vector2(104f, 88f), new Color(0.12f, 0f, 0f, 0.72f));
 
-        // Transparent tap targets follow the three stock inventory slots.
-        // Selecting a slot never uses its item.
-        MakeSlotSelectButton(0, new Vector2(-166f, -47f));
-        MakeSlotSelectButton(1, new Vector2(-97f, -47f));
-        MakeSlotSelectButton(2, new Vector2(-29f, -47f));
+        MakeSlotSelectButton(0);
+        MakeSlotSelectButton(1);
+        MakeSlotSelectButton(2);
+
     }
 
     private void MakeActionButton(string label, InputAction action, Vector2 position, Vector2 anchor, Vector2 size, Color color)
@@ -419,18 +424,54 @@ public class CursedMobileInput : MonoBehaviour
         button.onClick.AddListener(QueueItemUse);
     }
 
-    private void MakeSlotSelectButton(int slot, Vector2 position)
+    private void BindInventorySlots()
     {
-        GameObject buttonObject = MakePanel("Select Item Slot " + (slot + 1), transform, Color.clear);
-        RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
-        SetRect(buttonRect, Vector2.one, Vector2.one, new Vector2(68f, 80f), position);
-        lookBlockedRects.Add(buttonRect);
+        GameControllerScript controller = FindFirstObjectByType<GameControllerScript>();
+        if (controller == null || controller.itemSlot == null) return;
 
-        Button button = buttonObject.AddComponent<Button>();
-        button.targetGraphic = buttonObject.GetComponent<Image>();
-        button.transition = Selectable.Transition.None;
-        int capturedSlot = slot;
-        button.onClick.AddListener(delegate { QueueSlotSelection(capturedSlot); });
+        for (int slot = 0; slot < trackedSlotRects.Length; slot++)
+        {
+            trackedSlotRects[slot] = slot < controller.itemSlot.Length && controller.itemSlot[slot] != null
+                ? controller.itemSlot[slot].rectTransform
+                : null;
+        }
+    }
+
+    private void MakeSlotSelectButton(int slot)
+    {
+        GameObject touchTarget = MakePanel("Select Item Slot " + (slot + 1), transform, Color.clear);
+        RectTransform touchRect = touchTarget.GetComponent<RectTransform>();
+        SetRect(touchRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(76f, 92f), Vector2.zero);
+        slotTouchRects[slot] = touchRect;
+        lookBlockedRects.Add(touchRect);
+
+        CursedMobileSlotButton selector = touchTarget.AddComponent<CursedMobileSlotButton>();
+        selector.slot = slot;
+    }
+
+    private void UpdateInventorySlotTargets()
+    {
+        RectTransform mobileCanvasRect = transform as RectTransform;
+        if (mobileCanvasRect == null) return;
+
+        for (int slot = 0; slot < slotTouchRects.Length; slot++)
+        {
+            RectTransform target = slotTouchRects[slot];
+            RectTransform source = trackedSlotRects[slot];
+            if (target == null) continue;
+            target.gameObject.SetActive(source != null && canvas.enabled);
+            if (source == null || !canvas.enabled) continue;
+
+            source.GetWorldCorners(slotWorldCorners);
+            Vector2 screenMin = RectTransformUtility.WorldToScreenPoint(null, slotWorldCorners[0]);
+            Vector2 screenMax = RectTransformUtility.WorldToScreenPoint(null, slotWorldCorners[2]);
+            Vector2 screenCenter = (screenMin + screenMax) * 0.5f;
+            Vector2 localCenter;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(mobileCanvasRect, screenCenter, null, out localCenter))
+            {
+                target.anchoredPosition = localCenter;
+            }
+        }
     }
 
     private void QueueItemUse()
@@ -438,7 +479,7 @@ public class CursedMobileInput : MonoBehaviour
         itemUseQueued = true;
     }
 
-    private void QueueSlotSelection(int slot)
+    public static void QueueSlotSelection(int slot)
     {
         slotSelectionQueued = Mathf.Clamp(slot, 0, 2);
     }
@@ -491,6 +532,18 @@ public class CursedMobileInput : MonoBehaviour
         rect.pivot = new Vector2(0.5f, 0.5f);
         rect.sizeDelta = size;
         rect.anchoredPosition = position;
+    }
+
+    private sealed class CursedMobileSlotButton : MonoBehaviour, IPointerDownHandler
+    {
+        public int slot;
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            // Select immediately on finger-down. A small drag or release outside
+            // the slot must not cancel an inventory selection on Android.
+            CursedMobileInput.QueueSlotSelection(slot);
+        }
     }
 
     private class CursedJoystick : MonoBehaviour, IInitializePotentialDragHandler, IPointerDownHandler, IDragHandler, IPointerUpHandler
