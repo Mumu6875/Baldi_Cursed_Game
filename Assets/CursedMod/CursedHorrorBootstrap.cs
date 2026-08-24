@@ -45,7 +45,8 @@ public class CursedHorrorBootstrap : MonoBehaviour
         helpMeExitTexture = Resources.Load<Texture2D>("CursedMod/HelpMeExitSign");
         if (cursedBaldiTexture != null)
         {
-            cursedBaldiSprite = Sprite.Create(cursedBaldiTexture, new Rect(0f, 0f, cursedBaldiTexture.width, cursedBaldiTexture.height), new Vector2(0.5f, 0.02f), 256f);
+            // Match the centered pivot used by the original Baldi world sprites.
+            cursedBaldiSprite = Sprite.Create(cursedBaldiTexture, new Rect(0f, 0f, cursedBaldiTexture.width, cursedBaldiTexture.height), new Vector2(0.5f, 0.5f), 256f);
             cursedBaldiSprite.name = "Cursed Baldi Runtime Sprite";
         }
         if (helpMeExitTexture != null)
@@ -392,7 +393,12 @@ public class CursedBaldiVisual : MonoBehaviour
         float newHeight = cursedSprite.bounds.size.y;
         if (newHeight > 0.01f)
         {
-            float ratio = oldHeight / newHeight;
+            // The original 256 px sprite has 232 visible character pixels; the
+            // cursed 1536 px sprite has 1460. Ignore each texture's transparent
+            // padding so both characters have exactly the same visible height.
+            const float originalVisibleFraction = 232f / 256f;
+            const float cursedVisibleFraction = 1460f / 1536f;
+            float ratio = oldHeight * originalVisibleFraction / (newHeight * cursedVisibleFraction);
             transform.localScale = new Vector3(transform.localScale.x * ratio, transform.localScale.y * ratio, transform.localScale.z * ratio);
         }
         Animator animator = GetComponent<Animator>();
