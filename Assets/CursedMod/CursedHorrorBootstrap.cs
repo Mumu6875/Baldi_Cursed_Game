@@ -361,6 +361,14 @@ public static class CursedThinkPadInstaller
         GameObject root = math.mathGame != null ? math.mathGame : math.gameObject;
         if (root.transform.Find("Cursed Think Pad Skin") != null) return;
 
+        // The cursed artwork already contains its own ENTER ANSWER label.
+        // Remove only the stock placeholder layer while preserving the live
+        // TMP input text that displays the player's numeric answer.
+        if (math.playerAnswer != null && math.playerAnswer.placeholder != null)
+        {
+            math.playerAnswer.placeholder.gameObject.SetActive(false);
+        }
+
         // The stock YCTP image is opaque around its transparent display cutouts.
         // Hide only that background graphic; its keypad children remain active.
         Transform stockThinkPad = root.transform.Find("YCTP");
