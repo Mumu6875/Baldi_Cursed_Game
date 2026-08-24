@@ -353,10 +353,9 @@ public static class CursedThinkPadInstaller
     public static void ApplyTo(MathGameScript math)
     {
         if (math == null) return;
-        // Phase 2 is persisted between launches, while HorrorActive is only a
-        // runtime flag that is raised after an answer is submitted. Apply the
-        // skin as soon as the saved horror phase is active.
-        if (!CursedPhaseManager.IsPhase2) return;
+        // Keep Phase 2 notebooks normal until runtime horror activation: either
+        // a wrong first-notebook answer or the second notebook's final answer.
+        if (!CursedHorrorBootstrap.HorrorActive) return;
         Texture2D texture = Resources.Load<Texture2D>("CursedMod/CursedThinkPad");
         if (texture == null) return;
         GameObject root = math.mathGame != null ? math.mathGame : math.gameObject;
