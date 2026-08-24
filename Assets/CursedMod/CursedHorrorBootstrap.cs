@@ -361,13 +361,29 @@ public static class CursedThinkPadInstaller
         GameObject root = math.mathGame != null ? math.mathGame : math.gameObject;
         if (root.transform.Find("Cursed Think Pad Skin") != null) return;
 
+        // The stock YCTP image is opaque around its transparent display cutouts.
+        // Hide only that background graphic; its keypad children remain active.
+        Transform stockThinkPad = root.transform.Find("YCTP");
+        if (stockThinkPad != null)
+        {
+            RawImage stockBackground = stockThinkPad.GetComponent<RawImage>();
+            if (stockBackground != null) stockBackground.enabled = false;
+        }
+
         GameObject skin = new GameObject("Cursed Think Pad Skin", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
         skin.transform.SetParent(root.transform, false);
-        // The stock YCTP background is an opaque child of this canvas. Putting
-        // the cursed skin first leaves it hidden underneath that background.
-        // Render it last, but keep raycasts disabled so the original keypad and
-        // OK button underneath remain fully functional.
-        skin.transform.SetAsLastSibling();
+        // Insert the cursed background immediately before the live result layer.
+        // Questions, result marks, answer text and buttons then render above it.
+        int foregroundIndex = 1;
+        if (math.results != null && math.results.Length > 0 && math.results[0] != null)
+        {
+            Transform resultLayer = math.results[0].transform.parent;
+            if (resultLayer != null && resultLayer.parent == root.transform)
+            {
+                foregroundIndex = resultLayer.GetSiblingIndex();
+            }
+        }
+        skin.transform.SetSiblingIndex(Mathf.Clamp(foregroundIndex, 0, root.transform.childCount - 1));
         RectTransform rect = skin.GetComponent<RectTransform>();
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
