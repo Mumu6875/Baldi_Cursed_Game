@@ -45,8 +45,9 @@ public class CursedHorrorBootstrap : MonoBehaviour
         helpMeExitTexture = Resources.Load<Texture2D>("CursedMod/HelpMeExitSign");
         if (cursedBaldiTexture != null)
         {
-            // Match the centered pivot used by the original Baldi world sprites.
-            cursedBaldiSprite = Sprite.Create(cursedBaldiTexture, new Rect(0f, 0f, cursedBaldiTexture.width, cursedBaldiTexture.height), new Vector2(0.5f, 0.5f), 256f);
+            // Account for the different transparent bottom padding so the
+            // cursed feet use the exact same ground line as original Baldi.
+            cursedBaldiSprite = Sprite.Create(cursedBaldiTexture, new Rect(0f, 0f, cursedBaldiTexture.width, cursedBaldiTexture.height), new Vector2(0.5f, 0.5344603f), 256f);
             cursedBaldiSprite.name = "Cursed Baldi Runtime Sprite";
         }
         if (helpMeExitTexture != null)
