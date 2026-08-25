@@ -369,6 +369,15 @@ public static class CursedThinkPadInstaller
             math.playerAnswer.placeholder.gameObject.SetActive(false);
         }
 
+        // The TMP input field itself also owns the stock white background.
+        // Disable only that graphic in horror mode; keep the input field and
+        // its live answer text active so entered numbers remain visible.
+        if (math.playerAnswer != null)
+        {
+            Image stockAnswerBackground = math.playerAnswer.GetComponent<Image>();
+            if (stockAnswerBackground != null) stockAnswerBackground.enabled = false;
+        }
+
         // The stock YCTP image is opaque around its transparent display cutouts.
         // Hide only that background graphic; its keypad children remain active.
         Transform stockThinkPad = root.transform.Find("YCTP");
