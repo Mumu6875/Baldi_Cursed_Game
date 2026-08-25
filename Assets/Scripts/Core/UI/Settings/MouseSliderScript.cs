@@ -3,17 +3,20 @@ using UnityEngine.UI;
 
 public class MouseSliderScript : MonoBehaviour
 {
+	private const string MouseSensitivityKey = "MouseSensitivity";
+	private const float DefaultMouseSensitivity = 2f;
+
 	private void Start()
 	{
-		if (PlayerPrefs.GetFloat("MouseSensitivity") < 100f)
+		if (!PlayerPrefs.HasKey(MouseSensitivityKey))
 		{
-			PlayerPrefs.SetFloat("MouseSensitivity", 200f);
+			PlayerPrefs.SetFloat(MouseSensitivityKey, DefaultMouseSensitivity);
 		}
-		slider.value = PlayerPrefs.GetFloat("MouseSensitivity");
+		slider.value = Mathf.Clamp(PlayerPrefs.GetFloat(MouseSensitivityKey, DefaultMouseSensitivity), slider.minValue, slider.maxValue);
 	}
 	private void Update()
 	{
-		PlayerPrefs.SetFloat("MouseSensitivity", slider.value);
+		PlayerPrefs.SetFloat(MouseSensitivityKey, slider.value);
 	}
 	public Slider slider;
 }

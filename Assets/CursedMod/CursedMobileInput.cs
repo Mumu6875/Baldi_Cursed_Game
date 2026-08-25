@@ -29,6 +29,7 @@ public class CursedMobileInput : MonoBehaviour
 
     private const float LookSensitivity = 0.12f;
     private const float MaxLookPerFrame = 6.5f;
+    private const float DefaultMouseSensitivity = 2f;
     private static Sprite circleSprite;
 
     public static bool IsActive
@@ -211,7 +212,10 @@ public class CursedMobileInput : MonoBehaviour
             {
                 float screenDeltaX = touch.position.x - previousLookPosition.x;
                 previousLookPosition = touch.position;
-                float scaledDelta = screenDeltaX * LookSensitivity * (1920f / Mathf.Max(Screen.width, 1));
+                // Keep the original camera feel at the default value (2), while
+                // allowing the existing 0.1-10 options slider to affect touch look.
+                float sensitivityScale = Mathf.Clamp(PlayerPrefs.GetFloat("MouseSensitivity", DefaultMouseSensitivity) / DefaultMouseSensitivity, 0.05f, 5f);
+                float scaledDelta = screenDeltaX * LookSensitivity * sensitivityScale * (1920f / Mathf.Max(Screen.width, 1));
                 float limitedDelta = Mathf.Clamp(scaledDelta, -MaxLookPerFrame, MaxLookPerFrame);
                 lookDeltaX = Mathf.Clamp(lookDeltaX + limitedDelta, -18f, 18f);
             }

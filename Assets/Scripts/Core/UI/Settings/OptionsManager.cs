@@ -3,11 +3,19 @@ using UnityEngine.UI;
 
 public class OptionsManager : MonoBehaviour
 {
+	private const string MouseSensitivityKey = "MouseSensitivity";
+	private const float DefaultMouseSensitivity = 2f;
+
 	private void Start()
 	{
+		if (!PlayerPrefs.HasKey(MouseSensitivityKey))
+		{
+			PlayerPrefs.SetFloat(MouseSensitivityKey, DefaultMouseSensitivity);
+		}
+		slider.value = Mathf.Clamp(PlayerPrefs.GetFloat(MouseSensitivityKey, DefaultMouseSensitivity), slider.minValue, slider.maxValue);
+
 		if (PlayerPrefs.HasKey("OptionsSet"))
 		{
-			slider.value = PlayerPrefs.GetFloat("MouseSensitivity");
 			if (PlayerPrefs.GetInt("Rumble") == 1)
 			{
 				rumble.isOn = true;
@@ -32,7 +40,7 @@ public class OptionsManager : MonoBehaviour
 	}
 	private void Update()
 	{
-		PlayerPrefs.SetFloat("MouseSensitivity", slider.value);
+		PlayerPrefs.SetFloat(MouseSensitivityKey, slider.value);
 		if (rumble.isOn)
 		{
 			PlayerPrefs.SetInt("Rumble", 1);
