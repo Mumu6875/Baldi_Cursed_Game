@@ -466,6 +466,39 @@ public static class CursedThinkPadInstaller
     }
 }
 
+public static class CursedBaldiSizing
+{
+    // The School scene starts gameplay Baldi on Baldi_Slap0024. Its opaque
+    // bounds are 71x251 pixels at 100 PPU and its combined world scale is 3.2.
+    public const float CanonicalVisibleWorldWidth = 71f / 100f * 3.2f;
+    public const float CanonicalVisibleWorldHeight = 251f / 100f * 3.2f;
+
+    // CursedBaldi.png has a 434x1460 opaque region at 256 PPU, with 28
+    // transparent pixels below its feet.
+    public const float CursedVisibleWidthUnits = 434f / 256f;
+    public const float CursedVisibleHeightUnits = 1460f / 256f;
+    public const float CursedBottomPaddingUnits = 28f / 256f;
+    public const float CanonicalWorldScaleX = CanonicalVisibleWorldWidth / CursedVisibleWidthUnits;
+    public const float CanonicalWorldScaleY = CanonicalVisibleWorldHeight / CursedVisibleHeightUnits;
+
+    public static void GetSlapOpaqueMetrics(Sprite original, out float widthPixels, out float heightPixels, out float bottomPaddingPixels)
+    {
+        widthPixels = 71f;
+        heightPixels = 251f;
+        bottomPaddingPixels = 2f;
+        if (original == null) return;
+
+        switch (original.name)
+        {
+            case "Baldi_Slap0000": widthPixels = 102f; heightPixels = 232f; break;
+            case "Baldi_Slap0006": widthPixels = 94f; heightPixels = 232f; break;
+            case "Baldi_Slap0012": widthPixels = 75f; heightPixels = 232f; break;
+            case "Baldi_Slap0018": widthPixels = 71f; heightPixels = 243f; break;
+            case "Baldi_Slap0024": widthPixels = 71f; heightPixels = 251f; break;
+        }
+    }
+}
+
 public class CursedBaldiVisual : MonoBehaviour
 {
     private SpriteRenderer target;
@@ -475,18 +508,50 @@ public class CursedBaldiVisual : MonoBehaviour
     {
         target = renderer;
         cursedSprite = sprite;
-        float oldHeight = target.sprite != null ? target.sprite.bounds.size.y : 2.56f;
-        float newHeight = cursedSprite.bounds.size.y;
-        if (newHeight > 0.01f)
+        Sprite original = target.sprite;
+        Vector3 originalLossyScale = transform.lossyScale;
+        float originalScaleX = Mathf.Abs(originalLossyScale.x);
+        float originalScaleY = Mathf.Abs(originalLossyScale.y);
+
+        float visibleWidthPixels;
+        float visibleHeightPixels;
+        float bottomPaddingPixels;
+        CursedBaldiSizing.GetSlapOpaqueMetrics(original, out visibleWidthPixels, out visibleHeightPixels, out bottomPaddingPixels);
+
+        float originalPixelsPerUnit = original != null ? original.pixelsPerUnit : 100f;
+        float originalVisibleWorldWidth = visibleWidthPixels / originalPixelsPerUnit * originalScaleX;
+        float originalVisibleWorldHeight = visibleHeightPixels / originalPixelsPerUnit * originalScaleY;
+        float desiredWorldScaleX = originalVisibleWorldWidth / CursedBaldiSizing.CursedVisibleWidthUnits;
+        float desiredWorldScaleY = originalVisibleWorldHeight / CursedBaldiSizing.CursedVisibleHeightUnits;
+
+        float originalFootWorldY = transform.position.y;
+        if (original != null)
         {
-            // The original 256 px sprite has 232 visible character pixels; the
-            // cursed 1536 px sprite has 1460. Ignore each texture's transparent
-            // padding so both characters have exactly the same visible height.
-            const float originalVisibleFraction = 232f / 256f;
-            const float cursedVisibleFraction = 1460f / 1536f;
-            float ratio = oldHeight * originalVisibleFraction / (newHeight * cursedVisibleFraction);
-            transform.localScale = new Vector3(transform.localScale.x * ratio, transform.localScale.y * ratio, transform.localScale.z * ratio);
+            float originalPivotFraction = original.pivot.y / original.rect.height;
+            float originalFullWorldHeight = original.rect.height / originalPixelsPerUnit * originalScaleY;
+            float originalBottomPaddingWorld = bottomPaddingPixels / originalPixelsPerUnit * originalScaleY;
+            originalFootWorldY = transform.position.y - originalPivotFraction * originalFullWorldHeight + originalBottomPaddingWorld;
         }
+
+        Vector3 localScale = transform.localScale;
+        if (originalScaleX > 0.0001f) localScale.x *= desiredWorldScaleX / originalScaleX;
+        if (originalScaleY > 0.0001f) localScale.y *= desiredWorldScaleY / originalScaleY;
+        transform.localScale = localScale;
+
+        // Keep the first opaque foot pixel at exactly the same world height as
+        // the normal sprite while changing width and height independently.
+        float cursedFootOffset = (cursedSprite.bounds.min.y + CursedBaldiSizing.CursedBottomPaddingUnits) * desiredWorldScaleY;
+        Vector3 desiredWorldPosition = transform.position;
+        desiredWorldPosition.y = originalFootWorldY - cursedFootOffset;
+        if (transform.parent != null)
+        {
+            transform.localPosition = transform.parent.InverseTransformPoint(desiredWorldPosition);
+        }
+        else
+        {
+            transform.position = desiredWorldPosition;
+        }
+
         Animator animator = GetComponent<Animator>();
         if (animator != null) animator.enabled = false;
         target.sprite = cursedSprite;

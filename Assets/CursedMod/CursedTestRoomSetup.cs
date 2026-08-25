@@ -127,19 +127,18 @@ public sealed class CursedTestRoomSetup : MonoBehaviour
         renderer.sprite = sprite;
         renderer.color = Color.white;
 
-        // Match the normal School-scene Baldi, whose 256 px sprite uses 100
-        // pixels per unit and a combined 1.6 * 2 transform scale. Compare the
-        // visible pixels instead of transparent canvas padding so the feet and
-        // head occupy exactly the same world-space height.
-        const float normalBaldiFullHeight = 256f / 100f * 1.6f * 2f;
-        const float normalVisibleFraction = 232f / 256f;
-        const float cursedVisibleFraction = 1460f / 1536f;
-        const float cursedBottomPaddingFraction = 28f / 1536f;
-        const float targetHeight = normalBaldiFullHeight * normalVisibleFraction / cursedVisibleFraction;
-        float scale = sprite.bounds.size.y > 0.01f ? targetHeight / sprite.bounds.size.y : 1f;
-        visual.transform.localScale = Vector3.one * scale;
-        visual.transform.localPosition = Vector3.up *
-            (targetHeight * (0.5344603f - cursedBottomPaddingFraction));
+        // Use the same independent X/Y targets as the normal-game replacement.
+        // This matches Baldi_Slap0024's exact opaque 71x251 pixel bounds instead
+        // of merely approximating its height from the texture canvas.
+        visual.transform.localScale = new Vector3(
+            CursedBaldiSizing.CanonicalWorldScaleX,
+            CursedBaldiSizing.CanonicalWorldScaleY,
+            1f);
+
+        float cursedFootOffset =
+            (sprite.bounds.min.y + CursedBaldiSizing.CursedBottomPaddingUnits) *
+            CursedBaldiSizing.CanonicalWorldScaleY;
+        visual.transform.localPosition = Vector3.up * -cursedFootOffset;
     }
 
     private static void InstallPoster()
