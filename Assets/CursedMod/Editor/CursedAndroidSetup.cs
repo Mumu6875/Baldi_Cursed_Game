@@ -90,6 +90,7 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
     private const string Phase2CompletionAssetPath = "Assets/Resources/CursedMod/Phase2Completion.png";
     private const string Phase3PasswordAssetPath = "Assets/Resources/CursedMod/Phase3Password.png";
     private const string Phase4FinalAssetPath = "Assets/Resources/CursedMod/Phase4Final.png";
+    private const string TestRoomPosterAssetPath = "Assets/Resources/CursedMod/TestRoomEntityPoster.png";
     private static readonly string[] MobileButtonAssetPaths =
     {
         "Assets/Resources/CursedMod/MobileLookBackButton.png",
@@ -158,6 +159,17 @@ public sealed class CursedBuildValidation : IPreprocessBuildWithReport
             throw new BuildFailedException("Phase 4 final image must import as 1672x941: " + Phase4FinalAssetPath + FormatImportedSize(phase4));
         }
         Debug.Log("Verified Phase 4 final image: " + phase4.width + "x" + phase4.height);
+
+        if (!File.Exists(TestRoomPosterAssetPath))
+        {
+            throw new BuildFailedException("Required TestRoom laboratory poster is missing: " + TestRoomPosterAssetPath);
+        }
+        Texture2D testRoomPoster = ImportTextureWithoutNpotScaling(TestRoomPosterAssetPath);
+        if (testRoomPoster == null || testRoomPoster.width != 1672 || testRoomPoster.height != 941)
+        {
+            throw new BuildFailedException("TestRoom laboratory poster must import as 1672x941: " + TestRoomPosterAssetPath + FormatImportedSize(testRoomPoster));
+        }
+        Debug.Log("Verified TestRoom laboratory poster: " + testRoomPoster.width + "x" + testRoomPoster.height);
 
         foreach (string buttonPath in MobileButtonAssetPaths)
         {
