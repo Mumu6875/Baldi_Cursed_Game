@@ -187,13 +187,6 @@ public class GameControllerScript : MonoBehaviour
 		entrance_3.Lower();
 		baldiTutor.SetActive(false); //Turns off Baldi(The one that you see at the start of the game)
 		baldi.SetActive(true); //Turns on Baldi
-        principal.SetActive(true); //Turns on Principal
-        crafters.SetActive(true); //Turns on Crafters
-        playtime.SetActive(true); //Turns on Playtime
-        gottaSweep.SetActive(true); //Turns on Gotta Sweep
-        bully.SetActive(true); //Turns on Bully
-        firstPrize.SetActive(true); //Turns on First-Prize
-		//TestEnemy.SetActive(true); //Turns on Test-Enemy (Bonus)
 		audioDevice.PlayOneShot(aud_Hang); //Plays the hang sound
 		learnMusic.Stop(); //Stop all the music
 		schoolMusic.Stop();
@@ -402,22 +395,6 @@ public class GameControllerScript : MonoBehaviour
 					audioDevice.PlayOneShot(aud_Spray);
 				}
 			}
-			else if (item[itemSelected] == 9)
-			{
-				Ray ray6 = Camera.main.ScreenPointToRay(new Vector3((float)(Screen.width / 2), (float)(Screen.height / 2), 0f));
-				RaycastHit raycastHit6;
-				if (player.jumpRope)
-				{
-					player.DeactivateJumpRope();
-					playtimeScript.Disappoint();
-					ResetItem();
-				}
-				else if (Physics.Raycast(ray6, out raycastHit6) && raycastHit6.collider.name == "1st Prize")
-				{
-					firstPrizeScript.GoCrazy();
-					ResetItem();
-				}
-			}
 			else if (item[itemSelected] == 10)
 			{
 				player.ActivateBoots();
@@ -564,15 +541,6 @@ public class GameControllerScript : MonoBehaviour
 	public AudioClip aud_PrizeMobile;
 	public AudioClip aud_AllNotebooks;
 	public AudioClip aud_Teleport;
-	public GameObject principal;
-	public GameObject crafters;
-	public GameObject playtime;
-	public PlaytimeScript playtimeScript;
-	public GameObject gottaSweep;
-	public GameObject bully;
-	public GameObject firstPrize;
-	public GameObject TestEnemy;
-	public FirstPrizeScript firstPrizeScript;
 	public GameObject quarter;
 	public AudioSource tutorBaldi;
 	public RectTransform boots;
