@@ -36,6 +36,15 @@ public static class CursedPhaseManager
         get { return PlayerPrefs.GetInt(Phase4Key, 0) == 1; }
     }
 
+    /// <summary>
+    /// The 31718 route belongs exclusively to Phase 2. Later phases can retain
+    /// the Phase 2 preference while their own screens are active.
+    /// </summary>
+    public static bool IsTestRoomEnabled
+    {
+        get { return IsPhase2 && !IsPhase3 && !IsPhase4; }
+    }
+
     public static void UnlockPhase3(string password)
     {
         if (string.IsNullOrEmpty(password) || password.Length != 4)

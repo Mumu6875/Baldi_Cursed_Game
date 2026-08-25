@@ -35,8 +35,30 @@ public sealed class CursedTestRoomSetup : MonoBehaviour
     {
         if (scene.name == "TestRoom")
         {
+            if (!CursedPhaseManager.IsTestRoomEnabled)
+            {
+                SceneManager.LoadSceneAsync("MainMenu");
+                return;
+            }
+
             StartCoroutine(ConfigureAfterSceneStart(scene));
+            StartCoroutine(QuitToPhase1AfterDelay(scene));
         }
+    }
+
+    private IEnumerator QuitToPhase1AfterDelay(Scene scene)
+    {
+        yield return new WaitForSecondsRealtime(66.6f);
+        if (!scene.isLoaded) yield break;
+
+        // Persist the reset before Android closes so the next launch starts
+        // from Phase 1 and cannot reopen the 31718 route.
+        CursedPhaseManager.ResetToPhase1();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private IEnumerator ConfigureAfterSceneStart(Scene scene)
