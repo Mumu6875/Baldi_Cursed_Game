@@ -127,10 +127,19 @@ public sealed class CursedTestRoomSetup : MonoBehaviour
         renderer.sprite = sprite;
         renderer.color = Color.white;
 
-        const float targetHeight = 2.56f;
+        // Match the normal School-scene Baldi, whose 256 px sprite uses 100
+        // pixels per unit and a combined 1.6 * 2 transform scale. Compare the
+        // visible pixels instead of transparent canvas padding so the feet and
+        // head occupy exactly the same world-space height.
+        const float normalBaldiFullHeight = 256f / 100f * 1.6f * 2f;
+        const float normalVisibleFraction = 232f / 256f;
+        const float cursedVisibleFraction = 1460f / 1536f;
+        const float cursedBottomPaddingFraction = 28f / 1536f;
+        const float targetHeight = normalBaldiFullHeight * normalVisibleFraction / cursedVisibleFraction;
         float scale = sprite.bounds.size.y > 0.01f ? targetHeight / sprite.bounds.size.y : 1f;
         visual.transform.localScale = Vector3.one * scale;
-        visual.transform.localPosition = Vector3.up * (targetHeight * 0.5344603f);
+        visual.transform.localPosition = Vector3.up *
+            (targetHeight * (0.5344603f - cursedBottomPaddingFraction));
     }
 
     private static void InstallPoster()
@@ -148,7 +157,9 @@ public sealed class CursedTestRoomSetup : MonoBehaviour
         GameObject poster = GameObject.CreatePrimitive(PrimitiveType.Quad);
         poster.name = "BALD.ENTITY Laboratory Poster";
         poster.transform.position = new Vector3(2f, 2.65f, -8.56f);
-        poster.transform.rotation = Quaternion.identity;
+        // Unity's Quad front normal is local -Z. Rotate it so the front faces
+        // +Z, toward the TestRoom interior instead of into the back wall.
+        poster.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
         poster.transform.localScale = new Vector3(6f, 6f * posterTexture.height / posterTexture.width, 1f);
 
         Collider posterCollider = poster.GetComponent<Collider>();
