@@ -489,14 +489,7 @@ public class GameControllerScript : MonoBehaviour
 				baseTime *= increaseFactor;
 				currentTime = baseTime;
 			}
-			if (flipped)
-			{
-				player.height = 6f;
-			}
-			else
-			{
-				player.height = 4f;
-			}
+			player.height = 4f;
 			yield return null;
 		}
 		playerCharacter.enabled = true;
@@ -551,14 +544,6 @@ public class GameControllerScript : MonoBehaviour
 			audioDevice.Play();
 		}
 	}
-	public void Fliparoo()
-	{
-		flipped = true;
-		player.height = 6f;
-		player.fliparoo = 180f;
-		player.flipaturn = -1f;
-		Camera.main.GetComponent<CameraScript>().offset = new Vector3(0f, -1f, 0f);
-	}
 	public CursorControllerScript cursorController;
 	public PlayerScript player;
 	public Transform playerTransform;
@@ -579,7 +564,6 @@ public class GameControllerScript : MonoBehaviour
 	public AudioClip aud_PrizeMobile;
 	public AudioClip aud_AllNotebooks;
 	public AudioClip aud_Teleport;
-	private bool flipped;
 	public GameObject principal;
 	public GameObject crafters;
 	public GameObject playtime;

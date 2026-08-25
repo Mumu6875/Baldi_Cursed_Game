@@ -306,7 +306,7 @@ public class MathGameScript : MonoBehaviour
         {
             if (CursedPhaseManager.HandleSecondNotebookFinalAnswer()) return;
         }
-        bool cheatAnswer = playerAnswer.text == "31718" || playerAnswer.text == "53045009";
+        bool cheatAnswer = playerAnswer.text == "31718";
         bool correctAnswer = playerAnswer.text == solution.ToString() && !impossibleMode;
         if (gc.notebooks == 1 && problem <= 3 && !cheatAnswer && !correctAnswer)
         {
@@ -316,11 +316,6 @@ public class MathGameScript : MonoBehaviour
         {
             StartCoroutine(CheatText("THIS IS WHERE IT ALL BEGAN"));
             SceneManager.LoadSceneAsync("TestRoom");
-        }
-        else if (playerAnswer.text == "53045009")
-        {
-            StartCoroutine(CheatText("USE THESE TO STICK TO THE CEILING!"));
-            gc.Fliparoo();
         }
         if (problem <= 3)
         {
