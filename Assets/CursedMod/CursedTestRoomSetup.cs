@@ -63,9 +63,18 @@ public sealed class CursedTestRoomSetup : MonoBehaviour
 
     private IEnumerator ConfigureAfterSceneStart(Scene scene)
     {
-        // Let the scene finish Start() before adding the cursed entities.
+        // Let the scene finish Start() before removing its legacy NPC container.
         yield return null;
         if (!scene.isLoaded) yield break;
+
+        GameObject[] roots = scene.GetRootGameObjects();
+        for (int i = 0; i < roots.Length; i++)
+        {
+            if (roots[i] != null && roots[i].name == "NPC")
+            {
+                Destroy(roots[i]);
+            }
+        }
 
         Texture2D cursedTexture = Resources.Load<Texture2D>("CursedMod/CursedBaldi");
         if (cursedTexture != null)

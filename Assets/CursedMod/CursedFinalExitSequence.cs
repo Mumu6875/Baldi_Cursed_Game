@@ -93,6 +93,14 @@ public class CursedFinalExitSequence : MonoBehaviour
     {
         SetInactive(gc.baldiTutor);
         SetInactive(gc.baldi);
+        SetInactive(gc.principal);
+        SetInactive(gc.crafters);
+        SetInactive(gc.playtime);
+        SetInactive(gc.gottaSweep);
+        SetInactive(gc.bully);
+        SetInactive(gc.firstPrize);
+        SetInactive(gc.TestEnemy);
+
         if (gc.schoolMusic != null) gc.schoolMusic.Stop();
         if (gc.learnMusic != null) gc.learnMusic.Stop();
     }

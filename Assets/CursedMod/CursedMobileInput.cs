@@ -14,6 +14,7 @@ public class CursedMobileInput : MonoBehaviour
     private static Vector2 moveVector;
     private static float lookDeltaX;
     private static float pausePulseUntil;
+    private static float jumpPulseUntil;
     private static bool itemUseQueued;
     private static int slotSelectionQueued = -1;
 
@@ -51,6 +52,8 @@ public class CursedMobileInput : MonoBehaviour
             case InputAction.MoveRight: return moveVector.x > 0.075f;
             case InputAction.PauseOrCancel:
                 return actionStates[(int)action] || Time.unscaledTime < pausePulseUntil;
+            case InputAction.Jump:
+                return actionStates[(int)action] || Time.unscaledTime < jumpPulseUntil;
             default: return actionStates[(int)action];
         }
     }
@@ -127,6 +130,7 @@ public class CursedMobileInput : MonoBehaviour
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
             pausePulseUntil = 0f;
+            jumpPulseUntil = 0f;
             itemUseQueued = false;
             slotSelectionQueued = -1;
             for (int i = 0; i < actionStates.Length; i++) actionStates[i] = false;
@@ -141,6 +145,7 @@ public class CursedMobileInput : MonoBehaviour
         {
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
+            jumpPulseUntil = 0f;
             itemUseQueued = false;
             slotSelectionQueued = -1;
             ResetLookTouch();
@@ -160,14 +165,26 @@ public class CursedMobileInput : MonoBehaviour
         {
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
+            jumpPulseUntil = 0f;
             ResetLookTouch();
         }
         else if (canvas.enabled && Time.timeScale > 0f)
         {
-			UpdateRawTouchLook();
+            PlayerScript player = FindFirstObjectByType<PlayerScript>();
+            if (player != null && player.jumpRope)
+            {
+                ResetLookTouch();
+                UpdateJumpRopeTouch();
+            }
+            else
+            {
+                jumpPulseUntil = 0f;
+                UpdateRawTouchLook();
+            }
         }
         else
         {
+            jumpPulseUntil = 0f;
             ResetLookTouch();
         }
     }
@@ -216,6 +233,33 @@ public class CursedMobileInput : MonoBehaviour
         {
             ResetLookTouch();
         }
+    }
+
+    private void UpdateJumpRopeTouch()
+    {
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            Touch touch = Input.GetTouch(i);
+            if (touch.phase != TouchPhase.Began || IsControlTouch(touch.position)) continue;
+
+            // A short unscaled pulse is long enough for InputManager and
+            // CameraScript to observe even a very quick Android screen tap.
+            jumpPulseUntil = Time.unscaledTime + 0.14f;
+            break;
+        }
+    }
+
+    private bool IsControlTouch(Vector2 screenPosition)
+    {
+        for (int i = 0; i < lookBlockedRects.Count; i++)
+        {
+            RectTransform blocked = lookBlockedRects[i];
+            if (blocked != null && RectTransformUtility.RectangleContainsScreenPoint(blocked, screenPosition, null))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private bool IsLookTouchStart(Vector2 screenPosition)
