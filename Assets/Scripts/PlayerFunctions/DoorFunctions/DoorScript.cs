@@ -22,15 +22,7 @@ public class DoorScript : MonoBehaviour
 		}
 		if (openTime <= 0f & bDoorOpen)
 		{
-			barrier.enabled = true; // Turn on collision
-			invisibleBarrier.enabled = true; //Enable the invisible barrier
-			bDoorOpen = false; //Set the door open status to false
-			inside.material = closed; // Change one side of the door to the closed material
-			outside.material = closedOutside; // Change the other side of the door to the closed material
-            if (silentOpens <= 0) //If the door isn't silent
-			{
-				myAudio.PlayOneShot(doorClose, 1f); //Play the door close sound
-			}
+			CloseDoor();
 		}
 		if (Singleton<InputManager>.Instance.GetActionKeyDown(InputAction.Interact) && Time.timeScale != 0f) //If the door is left clicked and the game isn't paused
 		{
@@ -38,14 +30,21 @@ public class DoorScript : MonoBehaviour
 			RaycastHit raycastHit;
 			if (Physics.Raycast(ray, out raycastHit) && (raycastHit.collider == trigger & Vector3.Distance(player.position, transform.position) < openingDistance & !bDoorLocked))
 			{
-				if (baldi.isActiveAndEnabled & silentOpens <= 0)
+				if (bDoorOpen)
 				{
-					baldi.Hear(transform.position, 1f); //If the door isn't silent, Baldi hears the door with a priority of 1.
+					CloseDoor();
 				}
-				OpenDoor();
-				if (silentOpens > 0) //If the door is silent
+				else
 				{
-					silentOpens--; //Decrease the amount of opens the door will stay quite for.
+					if (baldi.isActiveAndEnabled & silentOpens <= 0)
+					{
+						baldi.Hear(transform.position, 1f); //If the door isn't silent, Baldi hears the door with a priority of 1.
+					}
+					OpenDoor();
+					if (silentOpens > 0) //If the door is silent
+					{
+						silentOpens--; //Decrease the amount of opens the door will stay quite for.
+					}
 				}
 			}
 		}
@@ -61,7 +60,24 @@ public class DoorScript : MonoBehaviour
 		bDoorOpen = true; //Set the door open status to false
 		inside.material = open; //Change one side of the door to the open material
 		outside.material = openOutside; //Change the other side of the door to the open material
-        openTime = 3f; //Set the open time to 3 seconds
+	        openTime = 3f; //Set the open time to 3 seconds
+	}
+	public void CloseDoor()
+	{
+		if (!bDoorOpen)
+		{
+			return;
+		}
+		barrier.enabled = true; // Turn on collision
+		invisibleBarrier.enabled = true; //Enable the invisible barrier
+		bDoorOpen = false;
+		openTime = 0f;
+		inside.material = closed;
+		outside.material = closedOutside;
+		if (silentOpens <= 0)
+		{
+			myAudio.PlayOneShot(doorClose, 1f);
+		}
 	}
 	private void OnTriggerStay(Collider other)
 	{

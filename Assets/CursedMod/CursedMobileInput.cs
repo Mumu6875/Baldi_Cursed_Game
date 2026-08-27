@@ -15,6 +15,7 @@ public class CursedMobileInput : MonoBehaviour
     private static float lookDeltaX;
     private static float pausePulseUntil;
     private static float jumpPulseUntil;
+    private static float interactPulseUntil;
     private static bool itemUseQueued;
     private static int slotSelectionQueued = -1;
 
@@ -22,6 +23,9 @@ public class CursedMobileInput : MonoBehaviour
     private bool sceneWantsVisible;
     private int lookFingerId = -1;
     private Vector2 previousLookPosition;
+    private Vector2 lookTouchStartPosition;
+    private float lookTouchStartTime;
+    private bool lookTouchExceededTapMovement;
     private readonly List<RectTransform> lookBlockedRects = new List<RectTransform>();
     private readonly RectTransform[] slotTouchRects = new RectTransform[3];
     private readonly RectTransform[] trackedSlotRects = new RectTransform[3];
@@ -30,6 +34,10 @@ public class CursedMobileInput : MonoBehaviour
     private const float LookSensitivity = 0.12f;
     private const float MaxLookPerFrame = 6.5f;
     private const float DefaultMouseSensitivity = 2f;
+    private const float TapMaxDuration = 0.30f;
+    private const float TapMaxMovementScreenFraction = 0.025f;
+    private const float MinTapMovementPixels = 18f;
+    private const float ActionPulseDuration = 0.14f;
     private static Sprite circleSprite;
 
     public static bool IsActive
@@ -50,6 +58,8 @@ public class CursedMobileInput : MonoBehaviour
             case InputAction.MoveBackward: return moveVector.y < -0.075f;
             case InputAction.MoveLeft: return moveVector.x < -0.075f;
             case InputAction.MoveRight: return moveVector.x > 0.075f;
+            case InputAction.Interact:
+                return actionStates[(int)action] || Time.unscaledTime < interactPulseUntil;
             case InputAction.PauseOrCancel:
                 return actionStates[(int)action] || Time.unscaledTime < pausePulseUntil;
             case InputAction.Jump:
@@ -79,7 +89,7 @@ public class CursedMobileInput : MonoBehaviour
         if (pressed && action == InputAction.PauseOrCancel)
         {
             // Keep a short unscaled pulse so InputManager cannot miss a quick tap.
-            pausePulseUntil = Time.unscaledTime + 0.14f;
+            pausePulseUntil = Time.unscaledTime + ActionPulseDuration;
         }
     }
 
@@ -109,6 +119,7 @@ public class CursedMobileInput : MonoBehaviour
         GameObject root = new GameObject("Cursed Mobile Controls");
         instance = root.AddComponent<CursedMobileInput>();
         DontDestroyOnLoad(root);
+        Input.simulateMouseWithTouches = false;
         instance.BuildUI();
         instance.BindInventorySlots();
     }
@@ -131,6 +142,7 @@ public class CursedMobileInput : MonoBehaviour
             lookDeltaX = 0f;
             pausePulseUntil = 0f;
             jumpPulseUntil = 0f;
+            interactPulseUntil = 0f;
             itemUseQueued = false;
             slotSelectionQueued = -1;
             for (int i = 0; i < actionStates.Length; i++) actionStates[i] = false;
@@ -146,6 +158,7 @@ public class CursedMobileInput : MonoBehaviour
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
             jumpPulseUntil = 0f;
+            interactPulseUntil = 0f;
             itemUseQueued = false;
             slotSelectionQueued = -1;
             ResetLookTouch();
@@ -166,6 +179,7 @@ public class CursedMobileInput : MonoBehaviour
             moveVector = Vector2.zero;
             lookDeltaX = 0f;
             jumpPulseUntil = 0f;
+            interactPulseUntil = 0f;
             ResetLookTouch();
         }
         else if (canvas.enabled && Time.timeScale > 0f)
@@ -185,6 +199,7 @@ public class CursedMobileInput : MonoBehaviour
         else
         {
             jumpPulseUntil = 0f;
+            interactPulseUntil = 0f;
             ResetLookTouch();
         }
     }
@@ -203,6 +218,9 @@ public class CursedMobileInput : MonoBehaviour
             {
                 lookFingerId = touch.fingerId;
                 previousLookPosition = touch.position;
+                lookTouchStartPosition = touch.position;
+                lookTouchStartTime = Time.unscaledTime;
+                lookTouchExceededTapMovement = false;
             }
 
             if (touch.fingerId != lookFingerId) continue;
@@ -210,6 +228,12 @@ public class CursedMobileInput : MonoBehaviour
 
             if (touch.phase == TouchPhase.Moved)
             {
+                float tapMovementThreshold = GetTapMovementThreshold();
+                if ((touch.position - lookTouchStartPosition).sqrMagnitude > tapMovementThreshold * tapMovementThreshold)
+                {
+                    lookTouchExceededTapMovement = true;
+                }
+
                 float screenDeltaX = touch.position.x - previousLookPosition.x;
                 previousLookPosition = touch.position;
                 // Keep the original camera feel at the default value (2), while
@@ -225,6 +249,10 @@ public class CursedMobileInput : MonoBehaviour
             }
             else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
             {
+                if (touch.phase == TouchPhase.Ended && IsShortWorldTap(touch.position))
+                {
+                    interactPulseUntil = Time.unscaledTime + ActionPulseDuration;
+                }
                 ResetLookTouch();
             }
         }
@@ -264,13 +292,15 @@ public class CursedMobileInput : MonoBehaviour
 
     private bool IsLookTouchStart(Vector2 screenPosition)
     {
-        // Match the old right-side look zone while leaving the top inventory HUD free.
-        if (screenPosition.x < Screen.width * 0.42f || screenPosition.y > Screen.height * 0.80f)
+        // The top inventory HUD is reserved. Every other non-control area can
+        // rotate the camera when dragged or interact when briefly tapped.
+        if (screenPosition.y > Screen.height * 0.80f)
         {
             return false;
         }
 
-        // RUN/GRAB/USE/PAUSE remain normal UI touches and must never rotate the camera.
+        // RUN/USE/PAUSE, the joystick and inventory slots remain normal UI
+        // touches and must never rotate the camera or interact with the world.
         for (int i = 0; i < lookBlockedRects.Count; i++)
         {
             RectTransform blocked = lookBlockedRects[i];
@@ -282,10 +312,30 @@ public class CursedMobileInput : MonoBehaviour
         return true;
     }
 
+    private bool IsShortWorldTap(Vector2 endPosition)
+    {
+        if (!IsLookTouchStart(endPosition))
+        {
+            return false;
+        }
+
+        float tapMovementThreshold = GetTapMovementThreshold();
+        bool endedWithinMovementThreshold = (endPosition - lookTouchStartPosition).sqrMagnitude <= tapMovementThreshold * tapMovementThreshold;
+        return !lookTouchExceededTapMovement && endedWithinMovementThreshold && Time.unscaledTime - lookTouchStartTime <= TapMaxDuration;
+    }
+
+    private static float GetTapMovementThreshold()
+    {
+        return Mathf.Max(MinTapMovementPixels, Mathf.Min(Screen.width, Screen.height) * TapMaxMovementScreenFraction);
+    }
+
     private void ResetLookTouch()
     {
         lookFingerId = -1;
         previousLookPosition = Vector2.zero;
+        lookTouchStartPosition = Vector2.zero;
+        lookTouchStartTime = 0f;
+        lookTouchExceededTapMovement = false;
     }
 
     private void BuildUI()
@@ -330,7 +380,6 @@ public class CursedMobileInput : MonoBehaviour
 
         MakeTextureActionButton("LookBackIcon", "CursedMod/MobileLookBackButton", InputAction.LookBehind, new Vector2(-135f, 335f), new Vector2(0.88f, 0f));
         MakeTextureActionButton("RunIcon", "CursedMod/MobileRunButton", InputAction.Run, new Vector2(-135f, 165f), new Vector2(0.88f, 0f));
-        MakeActionButton("GRAB", InputAction.Interact, new Vector2(-430f, 185f), new Vector2(0.88f, 0f), new Vector2(210f, 116f), new Color(0.18f, 0.02f, 0.02f, 0.82f));
         MakeTextureItemButton("ItemIcon", "CursedMod/MobileUseItemButton", new Vector2(-430f, 330f), new Vector2(0.88f, 0f));
         // Top-center placement avoids covering the third inventory slot.
         MakeActionButton("II", InputAction.PauseOrCancel, new Vector2(0f, -68f), new Vector2(0.5f, 1f), new Vector2(104f, 88f), new Color(0.12f, 0f, 0f, 0.72f));
