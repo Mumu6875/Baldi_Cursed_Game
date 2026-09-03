@@ -172,7 +172,8 @@ public class CursedMobileInput : MonoBehaviour
         // The Think Pad has its own touch buttons. Hide gameplay controls and
         // suspend raw camera-touch tracking while the math keypad is open.
         bool thinkPadIsOpen = FindFirstObjectByType<MathGameScript>() != null;
-        canvas.enabled = sceneWantsVisible && !thinkPadIsOpen;
+        // The pause menu must be the only touch interface while gameplay time is frozen.
+        canvas.enabled = sceneWantsVisible && !thinkPadIsOpen && Time.timeScale > 0f;
         UpdateInventorySlotTargets();
         if (thinkPadIsOpen)
         {
@@ -198,9 +199,14 @@ public class CursedMobileInput : MonoBehaviour
         }
         else
         {
+            moveVector = Vector2.zero;
+            lookDeltaX = 0f;
             jumpPulseUntil = 0f;
             interactPulseUntil = 0f;
+            itemUseQueued = false;
+            slotSelectionQueued = -1;
             ResetLookTouch();
+            for (int i = 0; i < actionStates.Length; i++) actionStates[i] = false;
         }
     }
 
