@@ -17,6 +17,7 @@ public class PlayerScript : MonoBehaviour
 		mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity");
 		principalBugFixer = 1;
 		flipaturn = 1f;
+		RefreshStaminaBar();
 	}
 	private void Update()
 	{
@@ -132,6 +133,10 @@ public class PlayerScript : MonoBehaviour
 	}
 	private void StaminaCheck()
 	{
+		if (zestyStaminaActive && stamina <= 0f)
+		{
+			zestyStaminaActive = false;
+		}
 		if (cc.velocity.magnitude > 0.1f)
 		{
 			if (Singleton<InputManager>.Instance.GetActionKey(InputAction.Run) & stamina > 0f)
@@ -147,7 +152,28 @@ public class PlayerScript : MonoBehaviour
 		{
 			stamina += staminaRate * Time.deltaTime;
 		}
-		staminaBar.value = stamina / maxStamina * 100f;
+		if (zestyStaminaActive && stamina <= 0f)
+		{
+			zestyStaminaActive = false;
+		}
+		RefreshStaminaBar();
+	}
+	public void ConsumeZestyBar()
+	{
+		stamina = maxStamina * 2f;
+		zestyStaminaActive = true;
+		RefreshStaminaBar();
+	}
+	private void RefreshStaminaBar()
+	{
+		if (staminaBar == null)
+		{
+			return;
+		}
+		float visualMaximum = zestyStaminaActive ? maxStamina * 2f : maxStamina;
+		staminaBar.minValue = 0f;
+		staminaBar.maxValue = visualMaximum;
+		staminaBar.value = Mathf.Clamp(stamina, 0f, visualMaximum);
 	}
 	private void OnTriggerEnter(Collider other)
 	{
@@ -270,6 +296,7 @@ public class PlayerScript : MonoBehaviour
 	private Vector3 moveDirection;
 	private float playerSpeed;
 	public float stamina;
+	private bool zestyStaminaActive;
 	public CharacterController cc;
 	public NavMeshAgent gottaSweep;
 	public NavMeshAgent firstPrize;
