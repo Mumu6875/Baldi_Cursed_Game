@@ -32,7 +32,9 @@ public class CursedMobileInput : MonoBehaviour
     private readonly Vector3[] slotWorldCorners = new Vector3[4];
 
     private const float LookSensitivity = 0.12f;
-    private const float MaxLookPerFrame = 6.5f;
+    private const float FastSwipeStartSpeed = 0.8f; // Screen widths per second.
+    private const float FastSwipeFullSpeed = 2.5f;
+    private const float FastSwipeMaxMultiplier = 4f;
     private const float DefaultMouseSensitivity = 2f;
     private const float TapMaxDuration = 0.30f;
     private const float TapMaxMovementScreenFraction = 0.025f;
@@ -245,9 +247,19 @@ public class CursedMobileInput : MonoBehaviour
                 // Keep the original camera feel at the default value (2), while
                 // allowing the existing 0.1-10 options slider to affect touch look.
                 float sensitivityScale = Mathf.Clamp(PlayerPrefs.GetFloat("MouseSensitivity", DefaultMouseSensitivity) / DefaultMouseSensitivity, 0.05f, 5f);
-                float scaledDelta = screenDeltaX * LookSensitivity * sensitivityScale * (1920f / Mathf.Max(Screen.width, 1));
-                float limitedDelta = Mathf.Clamp(scaledDelta, -MaxLookPerFrame, MaxLookPerFrame);
-                lookDeltaX = Mathf.Clamp(lookDeltaX + limitedDelta, -18f, 18f);
+                float screenWidth = Mathf.Max(Screen.width, 1);
+                float sampleTime = touch.deltaTime > 0f ? touch.deltaTime : Time.unscaledDeltaTime;
+                float swipeSpeed = Mathf.Abs(screenDeltaX) / screenWidth / Mathf.Max(sampleTime, 0.001f);
+                float swipeTravel = Mathf.Abs(touch.position.x - lookTouchStartPosition.x) / screenWidth;
+                // Short gestures and slow aiming retain the original sensitivity.
+                // Longer, fast swipes smoothly gain up to 4x turning distance.
+                float speedBlend = Mathf.SmoothStep(0f, 1f,
+                    Mathf.InverseLerp(FastSwipeStartSpeed, FastSwipeFullSpeed, swipeSpeed));
+                float travelBlend = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.025f, 0.08f, swipeTravel));
+                float turnMultiplier = Mathf.Lerp(1f, FastSwipeMaxMultiplier, speedBlend * travelBlend);
+                float scaledDelta = screenDeltaX * LookSensitivity * sensitivityScale * (1920f / screenWidth);
+                // Preserve all sampled movement instead of discarding it with a per-frame cap.
+                lookDeltaX += scaledDelta * turnMultiplier;
             }
             else if (touch.phase == TouchPhase.Stationary)
             {
