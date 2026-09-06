@@ -8,6 +8,7 @@ public class GameControllerScript : MonoBehaviour
 {
 	private void Start()
 	{
+		ShellItem.Register(this);
 		cullingMask = playerCamera.cullingMask; // Changes cullingMask in the Camera
 		audioDevice = GetComponent<AudioSource>(); //Get the Audio Source
 		schoolMusic.Play(); //Play the school music
@@ -303,6 +304,11 @@ public class GameControllerScript : MonoBehaviour
 	{
 		if (item[itemSelected] != 0)
 		{
+			if (item[itemSelected] == ShellItem.ItemId)
+			{
+				if (ShellItem.TryUse(this)) ResetItem();
+				return;
+			}
 			if (item[itemSelected] == 1)
 			{
 				player.ConsumeZestyBar();
@@ -598,7 +604,8 @@ public class GameControllerScript : MonoBehaviour
 		"WD-NoSquee (Door Type)",
 		"Safety Scissors",
 		"Big Ol' Boots",
-		"Teleportation Teleporter"
+		"Teleportation Teleporter",
+		"Shell"
 	};
 	public TMP_Text itemText;
 	public Texture[] itemTextures = new Texture[10];

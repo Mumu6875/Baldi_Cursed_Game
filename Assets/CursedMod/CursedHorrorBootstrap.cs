@@ -135,6 +135,7 @@ public class CursedHorrorBootstrap : MonoBehaviour
         {
             CursedMobileInput.EnsureForGameplayScene();
             CursedFinalExitSequence.EnsureInstalled();
+            ShellItem.InstallPickup(FindFirstObjectByType<GameControllerScript>());
             if (CursedPhaseManager.IsPhase2)
             {
                 PatchPhase2SceneVisuals();
