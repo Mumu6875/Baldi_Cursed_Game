@@ -424,7 +424,7 @@ public class CursedMobileInput : MonoBehaviour
         Text text = textObject.GetComponent<Text>();
         text.text = label;
         text.alignment = TextAnchor.MiddleCenter;
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         text.fontSize = 34;
         text.fontStyle = FontStyle.Bold;
         text.color = new Color(1f, 0.86f, 0.76f, 0.95f);
