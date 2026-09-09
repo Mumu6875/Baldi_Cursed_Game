@@ -26,6 +26,7 @@ public class CursedFinalExitSequence : MonoBehaviour
     private GameObject cafeteriaDoor99;
     private BoxCollider cafeteriaDoor99Trigger;
     private CursedRoom99Portal cafeteriaDoor99Portal;
+    private GameControllerScript activeController;
     private bool completionVisible;
     private string completionCode;
 
@@ -47,24 +48,41 @@ public class CursedFinalExitSequence : MonoBehaviour
     private IEnumerator Begin(ExitTriggerScript exit, Collider playerCollider, GameControllerScript gc)
     {
         sequenceActive = true;
+        activeController = gc;
         DisableAllFinalExitTriggers();
-        LockFinalExit(exit.transform);
+        SealFinalExit(exit);
         BuildOverlay();
+        messageText.text = string.Empty;
+        if (gc.notebookCount != null) gc.notebookCount.text = "Find the door.";
 
-        messageText.text = "FINAL EXIT LOCKED\nFIND CAFETERIA DOOR 99";
-        yield return Fade(0f, 1f, 0.75f);
-
-        HideCharacters(gc);
-        ApplyRoom99Lighting();
         Vector3 mazeOrigin = new Vector3(600f, gc.player.height - 0.45f, 600f);
         Vector3 spawnPosition;
         BuildMaze(mazeOrigin, out spawnPosition);
         ActivateCafeteriaDoor99Portal(spawnPosition);
+        yield break;
+    }
 
-        yield return new WaitForSecondsRealtime(0.55f);
-        messageText.text = "THE SCHOOL IS EMPTY";
-        yield return Fade(1f, 0f, 1.2f);
-        messageText.text = string.Empty;
+    private void SealFinalExit(ExitTriggerScript exit)
+    {
+        EntranceScript entrance = exit.GetComponentInParent<EntranceScript>();
+        if (entrance == null)
+        {
+            EntranceScript[] entrances = Resources.FindObjectsOfTypeAll<EntranceScript>();
+            float bestDistance = float.MaxValue;
+            for (int i = 0; i < entrances.Length; i++)
+            {
+                if (!entrances[i].gameObject.scene.IsValid() || entrances[i].gameObject.scene != exit.gameObject.scene) continue;
+                float distance = (entrances[i].transform.position - exit.transform.position).sqrMagnitude;
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    entrance = entrances[i];
+                }
+            }
+        }
+
+        if (entrance != null) entrance.Lower();
+        else LockFinalExit(exit.transform);
     }
 
     private void LockFinalExit(Transform exitTransform)
@@ -552,6 +570,13 @@ public class CursedFinalExitSequence : MonoBehaviour
     {
         if (instance != null) instance.QuitFromMaze();
     }
+
+    public static void EnterRoom99()
+    {
+        if (instance == null) return;
+        if (instance.activeController != null) instance.HideCharacters(instance.activeController);
+        instance.ApplyRoom99Lighting();
+    }
 }
 
 public class CursedMazeEndTrigger : MonoBehaviour
@@ -579,6 +604,7 @@ public class CursedRoom99Portal : MonoBehaviour
         if (player == null) return;
 
         entered = true;
+        CursedFinalExitSequence.EnterRoom99();
         CharacterController controller = player.cc;
         if (controller != null) controller.enabled = false;
         player.height = mazeSpawn.y;
