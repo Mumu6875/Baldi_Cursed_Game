@@ -11,7 +11,7 @@ public class NearExitTriggerScript : MonoBehaviour
             return;
         }
 
-        // The first three exits keep the original Baldi behavior.
+        // Preserve the original behavior for exits 1-3.
         if (gc.exitsReached < 3)
         {
             reached = true;
@@ -24,13 +24,36 @@ public class NearExitTriggerScript : MonoBehaviour
             return;
         }
 
-        // IMPORTANT: Start the cursed final-exit sequence here, on the SCHOOL
-        // side of the exit. Waiting for ExitTriggerScript means the player has
-        // already crossed the boundary and can end up outside the map.
-        if (CursedFinalExitSequence.TryStartFromNearExit(this, other, gc, es))
+        // Exit 4 must be intercepted on the SCHOOL side. If we wait for the
+        // outer ExitTriggerScript, the player has already crossed the map edge.
+        ExitTriggerScript finalExit = FindClosestExitTrigger();
+        if (finalExit != null && CursedFinalExitSequence.TryStart(finalExit, other, gc))
         {
             reached = true;
         }
+    }
+
+    private ExitTriggerScript FindClosestExitTrigger()
+    {
+        ExitTriggerScript[] exits = Resources.FindObjectsOfTypeAll<ExitTriggerScript>();
+        ExitTriggerScript closest = null;
+        float bestDistance = float.MaxValue;
+
+        for (int i = 0; i < exits.Length; i++)
+        {
+            ExitTriggerScript candidate = exits[i];
+            if (candidate == null || !candidate.gameObject.scene.IsValid()) continue;
+            if (candidate.gameObject.scene != gameObject.scene) continue;
+            if (candidate.gc != gc) continue;
+
+            float distance = (candidate.transform.position - transform.position).sqrMagnitude;
+            if (distance >= bestDistance) continue;
+
+            bestDistance = distance;
+            closest = candidate;
+        }
+
+        return closest;
     }
 
     public GameControllerScript gc;
