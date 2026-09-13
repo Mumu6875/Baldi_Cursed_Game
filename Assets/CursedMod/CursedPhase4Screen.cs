@@ -112,7 +112,6 @@ public sealed class CursedPhase4Screen : MonoBehaviour
     {
         if (quitting) return;
         quitting = true;
-        Debug.Log("Phase 4 screen tapped. Closing application.");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else

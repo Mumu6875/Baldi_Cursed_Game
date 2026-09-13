@@ -243,7 +243,6 @@ public sealed class CursedPhase3Screen : MonoBehaviour
     {
         if (quitting) return;
         quitting = true;
-        Debug.Log(reason);
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
