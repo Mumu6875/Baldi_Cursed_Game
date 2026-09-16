@@ -177,7 +177,7 @@ public class PlayerScript : MonoBehaviour
 	}
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.transform.name == "Baldi" & !gc.debugMode & !AndroidInvincibilityCheat.Enabled)
+		if (other.transform.name == "Baldi" & !gc.debugMode)
 		{
 			gameOver = true;
 			RenderSettings.skybox = blackSky; //Sets the skybox black
