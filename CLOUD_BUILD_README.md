@@ -1,12 +1,12 @@
 # Baldi Cursed Classroom — Unity Build Automation adayı
 
 Bu klasör, özgün Unity 2018.3.9f1 mod projesinin **ayrı** bir
-Unity 6000.3.22f1 (Unity 6.3 LTS) büyük-sürüm geçiş adayıdır. Özgün 2018.3
+Unity 6000.6.2f1 (Unity 6.6) geçiş sürümüdür. Özgün 2018.3
 projesi değiştirilmemiştir.
 
 ## Unity Build Automation ayarları
 
-- Unity sürümü: `6000.3.22f1` (Unity Build Automation destekli LTS)
+- Unity sürümü: `6000.6.2f1`
 - Platform: Android
 - Çıktı: APK (Google Play için AAB seçilebilir)
 - Minimum Android API: 26

@@ -16,7 +16,7 @@ Source page: https://pspleaffox.itch.io/baldi-open-source-classic-party
 
 ## Open and build an APK
 
-1. Install Unity Hub and Unity **2018.3.9f1** with **Android Build Support**, Android SDK/NDK and OpenJDK.
+1. Install Unity Hub and Unity **6000.6.2f1** with **Android Build Support**, Android SDK/NDK and OpenJDK.
 2. Add this folder as an existing project in Unity Hub.
 3. Wait for the first import to finish. The Android setup script runs automatically.
 4. Open `Assets/Scene/MainMenu.unity` for testing.

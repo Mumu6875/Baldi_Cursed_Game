@@ -43,7 +43,7 @@ public static class CursedAndroidSetup
         ApplyAndroidSettings();
         if (!EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android))
         {
-            EditorUtility.DisplayDialog("Android support missing", "Install Android Build Support, SDK/NDK and OpenJDK for Unity 2018.3.9f1 in Unity Hub.", "OK");
+            EditorUtility.DisplayDialog("Android support missing", "Install Android Build Support, SDK/NDK and OpenJDK for Unity 6000.6.2f1 in Unity Hub.", "OK");
             return;
         }
 
