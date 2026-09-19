@@ -387,7 +387,7 @@ public class CursedFinalExitSequence : MonoBehaviour
             messageText = null;
         }
 
-        if (FindFirstObjectByType<EventSystem>() == null)
+        if (FindAnyObjectByType<EventSystem>() == null)
         {
             new GameObject(
                 "EventSystem",

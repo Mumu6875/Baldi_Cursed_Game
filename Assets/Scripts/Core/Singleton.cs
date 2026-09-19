@@ -31,7 +31,7 @@ public class Singleton<T> : MonoBehaviour where T : Component
 
             if (instance == null)
             {
-                instance = FindFirstObjectByType<T>();
+                instance = FindAnyObjectByType<T>();
                 if (instance == null && Application.isPlaying)
                 {
                     instance = CreateInstance();

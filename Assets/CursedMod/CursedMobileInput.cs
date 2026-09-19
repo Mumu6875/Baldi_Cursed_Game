@@ -173,7 +173,7 @@ public class CursedMobileInput : MonoBehaviour
         if (canvas == null) return;
         // The Think Pad has its own touch buttons. Hide gameplay controls and
         // suspend raw camera-touch tracking while the math keypad is open.
-        bool thinkPadIsOpen = FindFirstObjectByType<MathGameScript>() != null;
+        bool thinkPadIsOpen = FindAnyObjectByType<MathGameScript>() != null;
         // The pause menu must be the only touch interface while gameplay time is frozen.
         canvas.enabled = sceneWantsVisible && !thinkPadIsOpen && Time.timeScale > 0f;
         UpdateInventorySlotTargets();
@@ -187,7 +187,7 @@ public class CursedMobileInput : MonoBehaviour
         }
         else if (canvas.enabled && Time.timeScale > 0f)
         {
-            PlayerScript player = FindFirstObjectByType<PlayerScript>();
+            PlayerScript player = FindAnyObjectByType<PlayerScript>();
             if (player != null && player.jumpRope)
             {
                 ResetLookTouch();
@@ -358,7 +358,7 @@ public class CursedMobileInput : MonoBehaviour
 
     private void BuildUI()
     {
-        if (FindFirstObjectByType<EventSystem>() == null)
+        if (FindAnyObjectByType<EventSystem>() == null)
         {
             GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
             DontDestroyOnLoad(eventSystem);
@@ -497,7 +497,7 @@ public class CursedMobileInput : MonoBehaviour
 
     private void BindInventorySlots()
     {
-        GameControllerScript controller = FindFirstObjectByType<GameControllerScript>();
+        GameControllerScript controller = FindAnyObjectByType<GameControllerScript>();
         if (controller == null || controller.itemSlot == null) return;
 
         for (int slot = 0; slot < trackedSlotRects.Length; slot++)

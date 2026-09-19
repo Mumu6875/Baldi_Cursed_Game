@@ -40,6 +40,7 @@ public struct SimulatedKeyState
 
 public class InputManager : Singleton<InputManager>
 {
+    [NonSerialized]
     public Dictionary<InputAction, InputBinding> KeyboardMapping = new Dictionary<InputAction, InputBinding>();
 
     private Dictionary<KeyCode, SimulatedKeyState> simulatedKeys = new Dictionary<KeyCode, SimulatedKeyState>();

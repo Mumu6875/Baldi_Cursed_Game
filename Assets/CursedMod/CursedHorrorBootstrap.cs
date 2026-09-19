@@ -130,12 +130,12 @@ public class CursedHorrorBootstrap : MonoBehaviour
         ApplyPhase2MusicSpeed(scene);
         PatchPhase2HowToPlayText(scene);
 
-        bool gameplay = FindFirstObjectByType<PlayerScript>() != null || FindFirstObjectByType<PlayerMovement>() != null;
+        bool gameplay = FindAnyObjectByType<PlayerScript>() != null || FindAnyObjectByType<PlayerMovement>() != null;
         if (gameplay)
         {
             CursedMobileInput.EnsureForGameplayScene();
             CursedFinalExitSequence.EnsureInstalled();
-            ShellItem.InstallPickup(FindFirstObjectByType<GameControllerScript>());
+            ShellItem.InstallPickup(FindAnyObjectByType<GameControllerScript>());
             if (CursedPhaseManager.IsPhase2)
             {
                 PatchPhase2SceneVisuals();
@@ -405,7 +405,7 @@ public class CursedHorrorBootstrap : MonoBehaviour
             }
         }
 
-        GameControllerScript controller = FindFirstObjectByType<GameControllerScript>();
+        GameControllerScript controller = FindAnyObjectByType<GameControllerScript>();
         if (controller != null)
         {
             // schoolMusic is heard when gameplay begins; learnMusic is the
@@ -525,8 +525,8 @@ public class CursedHorrorBootstrap : MonoBehaviour
     private void Update()
     {
         if (dangerFlash == null) return;
-        BaldiScript baldi = FindFirstObjectByType<BaldiScript>();
-        PlayerScript player = FindFirstObjectByType<PlayerScript>();
+        BaldiScript baldi = FindAnyObjectByType<BaldiScript>();
+        PlayerScript player = FindAnyObjectByType<PlayerScript>();
         float targetAlpha = 0f;
         if (baldi != null && player != null && baldi.gameObject.activeInHierarchy)
         {

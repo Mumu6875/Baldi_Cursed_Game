@@ -249740,8 +249740,7 @@ OcclusionCullingSettings:
     smallestHole: 0.25
     backfaceThreshold: 100
   m_SceneGUID: 02778db063e5ee846980944a550e48a8
-  m_OcclusionCullingData: {fileID: 36300000, guid: b5ac51e1e95a43a4a8a2ae91ec5e4109,
-    type: 2}
+  m_OcclusionCullingData: {fileID: 0}
 --- !u!33 &13855
 MeshFilter:
   m_ObjectHideFlags: 0
